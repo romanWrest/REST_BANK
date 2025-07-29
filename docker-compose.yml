@@ -3,6 +3,7 @@ services:
     image: mysql:8.0
     environment:
       MYSQL_ROOT_PASSWORD: 12345
+      MYSQL_DATABASE: BANKREST
     volumes:
       - mysql_data:/var/lib/mysql
     ports:

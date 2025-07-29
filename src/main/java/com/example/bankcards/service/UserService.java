@@ -7,6 +7,7 @@ import com.example.bankcards.entity.enums.RoleUsers;
 import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -22,7 +23,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
+    // INSERT INTO users VALUES(id, email, password, phone_number, role, username)
     @Transactional
     public UserDTO registerUser(UserRegisterDTO dto) {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
