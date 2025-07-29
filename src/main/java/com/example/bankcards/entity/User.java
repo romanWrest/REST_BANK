@@ -20,19 +20,25 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "username", nullable = false)
     private String username;
     @Column(name = "email", unique = true)
+
     private String email;
     @Column(name = "password", length = 1000)
+
     private String password;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+
     private List<Card> cards = new ArrayList<>();
     @Column(name = "phone_number", nullable = false)
     @Size(min = 16, max = 255)
+
     private String phoneNumber;
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
+
     private RoleUsers role;
 
 

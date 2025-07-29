@@ -40,11 +40,11 @@
         </dependency>
 
         <!-- Liquibase -->
-        <dependency>
+     <!--   <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>4.29.1</version>
-        </dependency>
+        </dependency>-->
 
         <!-- JWT -->
         <!--<dependency>
@@ -79,24 +79,23 @@
         </dependency>
 
         <!-- PostgreSQL Driver -->
-        <dependency>
+     <!--   <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.4</version>
             <scope>runtime</scope>
         </dependency>
-
+-->
         <!-- MySQL Driver (optional, comment out if using PostgreSQL) -->
-        <!--
-        <dependency>
+
+       <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>9.0.0</version>
             <scope>runtime</scope>
         </dependency>
-        -->
 
-        <!-- Spring Boot Starter Test -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -104,18 +103,30 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Spring Security Test -->
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <version>6.3.1</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
 
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.30</version> <!-- Актуальная версия -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.5.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>1.5.5.Final</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
