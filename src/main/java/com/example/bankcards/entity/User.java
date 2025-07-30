@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,13 +34,15 @@ public class User  {
     private List<Card> cards = new ArrayList<>();
     @Column(name = "phone_number", nullable = false)
     @Size(min = 16, max = 255)
-
     private String phoneNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-
     private RoleUsers role;
 
+    public RoleUsers getRole() {
+        return role;
+    }
 
     public boolean isAdmin() {
         return role == RoleUsers.ROLE_ADMIN;
