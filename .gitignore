@@ -1,3 +1,16 @@
 target/
 build/
 out/
+
+### Intellij ###
+.idea
+*.iml
+*.iws
+
+### Eclipse ###
+.metadata
+bin/
+tmp/
+.settings/
+.project
+.classpath

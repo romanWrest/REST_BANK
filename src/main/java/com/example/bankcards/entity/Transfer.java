@@ -24,6 +24,7 @@ public class Transfer {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_card_id", nullable = false)
     private Card fromCard;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_card_id", nullable = false)
     private Card toCard;
@@ -31,4 +32,5 @@ public class Transfer {
     @Column(name = "amount", nullable = false)
     @Positive
     private BigDecimal amount;
+
 }

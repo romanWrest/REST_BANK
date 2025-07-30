@@ -10,9 +10,10 @@ import com.example.bankcards.exception.DuplicateResourceException;
 import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
-import com.example.bankcards.util.CardMapper;
+import com.example.bankcards.mappers.CardMapper;
 import com.example.bankcards.util.EncryptionService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,6 +22,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CardService {
@@ -32,6 +34,8 @@ public class CardService {
 
     @Transactional
     public CardDTO createCard(CardCreateDTO dto) {
+        // А тут мы палим данные карты (См MaskingUtil.class)
+        log.info("Creating card={}", dto.toString());
         // Проверка уникальности номера карты
         if (cardRepository.findByNumber(dto.getNumber()).isPresent()) {
             throw new DuplicateResourceException("Card number already exists");
@@ -44,18 +48,20 @@ public class CardService {
         // Проверка прав: только админ
         checkAdminAccess();
 
-        Card card = new Card();
+        // Давай сразу добавим в маппер -> cardMapper.toEntity
+        Card card = cardMapper.toEntity(dto);
         card.setNumber(encryptionService.encrypt(dto.getNumber()));
-        card.setOwner(dto.getOwner());
-        card.setExpiryDate(dto.getExpiryDate());
-        card.setBalance(dto.getBalance());
-        card.setStatus(CardStatus.ACTIVE);
-        card.setBank(dto.getBank());
-        card.setUser(user);
+
         card = cardRepository.save(card);
+
+        // И тут мы палим данные карты (См MaskingUtil.class)
+        log.info("Card saved={}", card.toString());
         return cardMapper.toCardDTO(card);
     }
 
+    @Transactional(readOnly = true)
+    // транщакции должны быть везде, где есть обращение к бд.
+    // Если только чтение, то ставь флаг readOnly = true
     public CardDTO getCard(Long id) {
         Card card = cardRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
@@ -74,7 +80,7 @@ public class CardService {
         // Проверка доступа
         checkUserAccess(user.getEmail());
 
-        return cardRepository.findByUserId(userId, pageable).map(CardMapper::toCardDTO);
+        return cardRepository.findByUserId(userId, pageable).map(cardMapper::toCardDTO);
     }
 
     public Page<CardDTO> getUserCardsByStatus(Long userId, CardStatus status, Pageable pageable) {
@@ -91,7 +97,7 @@ public class CardService {
         // Проверка доступа
         checkUserAccess(user.getEmail());
 
-        return cardRepository.findByUserIdAndStatus(userId, status, pageable).map(CardMapper::toCardDTO);
+        return cardRepository.findByUserIdAndStatus(userId, status, pageable).map(cardMapper::toCardDTO);
     }
 
     @Transactional

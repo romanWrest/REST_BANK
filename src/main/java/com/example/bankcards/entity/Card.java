@@ -11,21 +11,26 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Data
+@Data // описано в User.class
 @Entity
 @Table(name = "cards")
 @Valid
 public class Card {
+    // Сорри, отступы в глаз попали))
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
+
     @Column(name = "number", nullable = false)
     private String number;
+
     @Column(name = "owner")
     private String owner;
+
     @Column(name = "expiry_date", nullable = false)
     private LocalDate expiryDate;
+
     @Column(name = "balance", nullable = false)
     @PositiveOrZero
     private BigDecimal balance;
@@ -37,6 +42,7 @@ public class Card {
     @Enumerated(EnumType.STRING)
     @Column(name = "bank", nullable = false)
     private Banks bank;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private CardStatus status;

@@ -33,6 +33,8 @@ public class CardDTO {
     @NotNull
     private CardStatus status;
 
+    //Ну, по хорошему, не стоит банк делать через enum, так как динамически его будет сложно добавить.
+    //Лучший вариант, конечно, отдельная таблица с банками
     @NotNull
     private Banks bank;
 }
