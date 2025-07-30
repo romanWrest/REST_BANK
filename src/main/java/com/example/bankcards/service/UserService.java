@@ -24,7 +24,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     @Transactional
     public UserDTO registerUser(UserRegisterDTO dto) {
-        if (userRepository.findByUsername(dto.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("Почта уже существует");
         }
                 if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
@@ -41,9 +41,9 @@ public class UserService {
         return toUserDTO(user);
     }
 
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("email not found"));
     }
 
     public UserDTO getUser(Long id) {

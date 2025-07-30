@@ -17,28 +17,28 @@ public class JwtService {
     @Value("91c0d7ada653f590ff8ce22a926fa0ae")
     private String jwtSecret;
 
-    public JwtAuthenticationDto generateAutoToken(String fullName) {
+    public JwtAuthenticationDto generateAutoToken(String email) {
         JwtAuthenticationDto jwtDto = new JwtAuthenticationDto();
-        jwtDto.setToken(generateJwtToken(fullName));
-        jwtDto.setRefreshToken(generateRefreshJwtToken(fullName));
+        jwtDto.setToken(generateJwtToken(email));
+        jwtDto.setRefreshToken(generateRefreshJwtToken(email));
         return null;
     }
 
     //public JwtAuthenticationDto refreshBaseToken(fullname)
 
-    private String generateJwtToken(String fullName) {
+    private String generateJwtToken(String email) {
         Date date = Date.from(LocalDateTime.now().plusMinutes(1).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
-                .subject(fullName)
+                .subject(email)
                 .expiration(date) // подпись
                 .signWith(getSingKey())
                 .compact();
     }
 
-    private String generateRefreshJwtToken(String fullName) {
+    private String generateRefreshJwtToken(String email) {
         Date date = Date.from(LocalDateTime.now().plusDays(1).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder() //рефреш токен валиден 1 день^
-                .subject(fullName)
+                .subject(email)
                 .expiration(date) // подпись
                 .signWith(getSingKey())
                 .compact();
