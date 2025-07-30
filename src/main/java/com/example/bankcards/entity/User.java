@@ -4,8 +4,8 @@ import com.example.bankcards.entity.enums.RoleUsers;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "users")
 @Valid
-public class User {
+public class User  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -23,9 +23,9 @@ public class User {
 
     @Column(name = "username", nullable = false)
     private String username;
-    @Column(name = "email", unique = true)
 
-    private String email;
+    @Column(name = "fullname", unique = true)
+    private String fullName;
     @Column(name = "password", length = 1000)
 
     private String password;
@@ -45,6 +45,7 @@ public class User {
     public boolean isAdmin() {
         return role == RoleUsers.ROLE_ADMIN;
     }
+
 
 
 }

@@ -13,8 +13,8 @@ public class UserDTO {
     private String username;
 
     @NotNull
-    @Email
-    private String email;
+    @Size(min = 3, max = 50)
+    private String fullName;
 
     @NotNull
     @Size(min = 10, max = 11)

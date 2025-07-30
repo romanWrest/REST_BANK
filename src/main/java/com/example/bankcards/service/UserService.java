@@ -7,7 +7,6 @@ import com.example.bankcards.entity.enums.RoleUsers;
 import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
@@ -29,7 +28,7 @@ public class UserService {
         if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Имя уже существует");
         }
-        if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
+        if (userRepository.findByFullName(dto.getFullName()).isPresent()) {
             throw new IllegalArgumentException("Email уже существует");
         }
         if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
@@ -38,7 +37,7 @@ public class UserService {
 
         User user = new User();
         user.setUsername(dto.getUsername());
-        user.setEmail(dto.getEmail());
+        user.setFullName(dto.getFullName());
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(RoleUsers.ROLE_USER);
@@ -81,7 +80,7 @@ public class UserService {
     private UserDTO toUserDTO(User user) {
         UserDTO dto = new UserDTO();
         dto.setUsername(user.getUsername());
-        dto.setEmail(user.getEmail());
+        dto.setFullName(user.getFullName());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setRole(user.getRole());
         return dto;
