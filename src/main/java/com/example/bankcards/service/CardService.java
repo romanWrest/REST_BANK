@@ -20,7 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.bankcards.util.CardMapper;
+
 @Service
 @RequiredArgsConstructor
 public class CardService {
@@ -61,7 +61,7 @@ public class CardService {
                 .orElseThrow(() -> new ResourceNotFoundException("Card not found"));
 
         // Проверка доступа: пользователь или админ
-        checkUserAccess(card.getUser().getUsername());
+        checkUserAccess(card.getUser().getEmail());
 
         return cardMapper.toCardDTO(card);
     }
@@ -72,7 +72,7 @@ public class CardService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Проверка доступа
-        checkUserAccess(user.getUsername());
+        checkUserAccess(user.getEmail());
 
         return cardRepository.findByUserId(userId, pageable).map(CardMapper::toCardDTO);
     }
@@ -89,7 +89,7 @@ public class CardService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // Проверка доступа
-        checkUserAccess(user.getUsername());
+        checkUserAccess(user.getEmail());
 
         return cardRepository.findByUserIdAndStatus(userId, status, pageable).map(CardMapper::toCardDTO);
     }

@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +20,10 @@ public class User  {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username", nullable = false)
-    private String username;
+    @Column(name = "email", nullable = false)
+    private String email;
 
-    @Column(name = "fullname", unique = true)
+    @Column(name = "fullname")
     private String fullName;
     @Column(name = "password", length = 1000)
 

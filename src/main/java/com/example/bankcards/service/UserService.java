@@ -22,21 +22,17 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    // INSERT INTO users VALUES(id, email, password, phone_number, role, username)
     @Transactional
     public UserDTO registerUser(UserRegisterDTO dto) {
-        if (userRepository.findByUsername(dto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("Имя уже существует");
+        if (userRepository.findByUsername(dto.getEmail()).isPresent()) {
+            throw new IllegalArgumentException("Почта уже существует");
         }
-        if (userRepository.findByFullName(dto.getFullName()).isPresent()) {
-            throw new IllegalArgumentException("Email уже существует");
-        }
-        if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
+                if (userRepository.findByPhoneNumber(dto.getPhoneNumber()).isPresent()) {
             throw new IllegalArgumentException("Номер телефона уже существует");
         }
 
         User user = new User();
-        user.setUsername(dto.getUsername());
+        user.setEmail(dto.getEmail());
         user.setFullName(dto.getFullName());
         user.setPhoneNumber(dto.getPhoneNumber());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -58,7 +54,7 @@ public class UserService {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin && !user.getUsername().equals(auth.getName())) {
+        if (!isAdmin && !user.getEmail().equals(auth.getName())) {
             throw new AccessDeniedException("Access denied");
         }
 
@@ -79,7 +75,7 @@ public class UserService {
 
     private UserDTO toUserDTO(User user) {
         UserDTO dto = new UserDTO();
-        dto.setUsername(user.getUsername());
+        dto.setEmail(user.getEmail());
         dto.setFullName(user.getFullName());
         dto.setPhoneNumber(user.getPhoneNumber());
         dto.setRole(user.getRole());
