@@ -1,14 +1,14 @@
 package com.example.bankcards.repository;
 
-import com.example.bankcards.entity.User;
+import com.example.bankcards.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByFullName(String fullName);
-    Optional<User> findByEmail(String email);
-    Optional<User> findByPhoneNumber(String phoneNumber);
+public interface UserRepository extends JpaRepository<UserEntity, Long> {
+    Optional<UserEntity> findByEmailOrPhoneNumber(String email, String phoneNumber);
+    Optional<UserEntity> findByEmail(String email);
+    Optional<UserEntity> findByPhoneNumber(String phoneNumber);
 }

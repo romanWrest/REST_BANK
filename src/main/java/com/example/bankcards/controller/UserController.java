@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
 
@@ -27,6 +27,19 @@ public class UserController {
         return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     }
 
+    @GetMapping("/test")
+    public String test() {
+        return "Test OK";
+    }
+    @GetMapping("/")
+    public ResponseEntity<String> home() {
+        return ResponseEntity.ok("Bank Cards API Home");
+    }
+
+    @GetMapping("/registration")
+    public ResponseEntity<String> showRegistrationForm() {
+        return ResponseEntity.ok("Registration endpoint for GET /api/users/registration");
+    }
     @GetMapping("/{id}")
     public UserDTO getUser(@PathVariable("id") Long id) {
         return userService.getUser(id);

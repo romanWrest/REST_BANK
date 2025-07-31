@@ -4,7 +4,6 @@ import com.example.bankcards.entity.enums.Banks;
 import com.example.bankcards.entity.enums.CardStatus;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
@@ -15,7 +14,7 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "cards")
 @Valid
-public class Card {
+public class CardEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -32,7 +31,7 @@ public class Card {
 
     @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "bank", nullable = false)
@@ -40,7 +39,6 @@ public class Card {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private CardStatus status;
-
 
 
 }

@@ -4,18 +4,20 @@ import com.example.bankcards.entity.enums.RoleUsers;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Entity
+@ToString(exclude = {"password"})
 @Table(name = "users")
 @Valid
-public class User  {
+public class UserEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -26,12 +28,12 @@ public class User  {
 
     @Column(name = "fullname")
     private String fullName;
+
     @Column(name = "password", length = 1000)
-
     private String password;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
 
-    private List<Card> cards = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CardEntity> cardEntities = new ArrayList<>();
     @Column(name = "phone_number", nullable = false)
     @Size(min = 16, max = 255)
     private String phoneNumber;
@@ -39,14 +41,6 @@ public class User  {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private RoleUsers role;
-
-    public RoleUsers getRole() {
-        return role;
-    }
-
-    public boolean isAdmin() {
-        return role == RoleUsers.ROLE_ADMIN;
-    }
 
 
 

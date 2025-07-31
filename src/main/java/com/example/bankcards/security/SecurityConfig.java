@@ -1,6 +1,7 @@
 package com.example.bankcards.security;
 
 import com.example.bankcards.security.jwt.JwtFilter;
+import com.example.bankcards.mappers.CardMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,8 +30,13 @@ public class SecurityConfig {
         http
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("user/registration", "auth/**").permitAll()
-                        .requestMatchers("/**").authenticated())
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/users/test",
+                                "/users/",
+                                "/users/registration",
+                                "/user/registration",
+                                "/auth/**",
+                                "/").permitAll()
+                          .requestMatchers("/lol").authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
@@ -46,4 +52,7 @@ public class SecurityConfig {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }
+
+
+
 }
