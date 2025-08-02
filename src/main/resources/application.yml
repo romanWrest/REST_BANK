@@ -1,4 +1,15 @@
+server:
+  port: 8080
+  error:
+    include-stacktrace: never
+
+  spring:
+    mvc:
+      problemdetails:
+        enabled: true
+
 debug: true
+
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/BANKREST?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
@@ -24,10 +35,10 @@ logging:
         bankcards: DEBUG
 
 encryption:
-  key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  key: c362b68d0793bd37b7b5252f250d4abbe02e671cd98d725d73d63bfd2ca3bda3417c7443
 
-#Что нужно сделать:
- # - Указать настройки подключения к базе данных.
+  #Что нужно сделать:
+  # - Указать настройки подключения к базе данных.
   #- Указать порт приложения.
   #- Настроить параметры безопасности и JWT.
   #- Включить Swagger UI.

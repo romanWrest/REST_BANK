@@ -1,24 +1,16 @@
 package com.example.bankcards.dto.Card;
 
+import com.example.bankcards.entity.enums.BlockRequestStatus;
 import com.example.bankcards.entity.enums.CardStatus;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
 @Data
-public class CardDTO {
+public class CardSetStatusResponseDTO {
     @NotNull
     private Long id;
 
-    @NotNull
-    private String maskedNumber;
-
-    @NotNull
-    @PositiveOrZero
-    private BigDecimal balance;
-
-    @NotNull
     private CardStatus status;
+    
+    private BlockRequestStatus blockRequestStatus;
 }

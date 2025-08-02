@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>bank-card-management</artifactId>
+    <artifactId>bank-cardEntity-management</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>Bank Card Management</name>
     <description>Spring Boot application for managing bank cards</description>
@@ -107,6 +107,12 @@
             <version>6.3.1</version>
             <scope>test</scope>
         </dependency>-->
+
+        <dependency>
+            <groupId>org.hibernate.validator</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>8.0.1.Final</version>
+        </dependency>
 
 
         <dependency>

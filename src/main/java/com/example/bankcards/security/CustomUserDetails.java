@@ -9,45 +9,58 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public record CustomUserDetails(UserEntity userEntity) implements UserDetails {
+public class CustomUserDetails implements UserDetails {
+    private final String email;
+    private final String password;
+    private final String role;
 
+    public CustomUserDetails(UserEntity userEntity) {
+        this.email = userEntity.getEmail();
+        this.password = userEntity.getPassword();
+        this.role = userEntity.getRole() != null ? userEntity.getRole().name() : null;
+    }
+
+    public CustomUserDetails(String email, String role) {
+        this.email = email;
+        this.password = null;
+        this.role = role;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if (userEntity.getRole() == null) {
+        if (role == null) {
             return Collections.emptyList();
         }
-        return List.of(new SimpleGrantedAuthority(userEntity.getRole().name()));
+        return List.of(new SimpleGrantedAuthority(role));
     }
 
     @Override
     public String getPassword() {
-        return userEntity.getPassword();
+        return password;
     }
 
     @Override
     public String getUsername() {
-        return userEntity.getEmail();
+        return email;
     }
-
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true;
     }
 }

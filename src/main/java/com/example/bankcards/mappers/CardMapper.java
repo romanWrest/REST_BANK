@@ -9,23 +9,25 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 import org.mapstruct.Named;
 
+
 @Mapper(componentModel = "spring")
 public interface CardMapper {
 
-    // Все поля с одинаковыми типами и именами mapstruct мапит сам. С разными именами - достаточно указать source и target.
-    // qualifiedByName - это если для маппинга требуется функция
     @Mappings({
             @Mapping(source = "number", target = "maskedNumber", qualifiedByName = "maskedNumberMapper"),
+            @Mapping(source = "status", target = "status"),
     })
     CardDTO toCardDTO(CardEntity cardEntity);
+
 
     @Named("maskedNumberMapper")
     static String maskedNumberMapper(String number) {
         return MaskingUtil.maskCardNumber(number);
     }
 
-    // так как все поля совпадают, то ничего делать не нужно
-    @Mapping(target = "id", ignore = true)
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+    })
     CardEntity toEntity(CardCreateDTO dto);
 
 }

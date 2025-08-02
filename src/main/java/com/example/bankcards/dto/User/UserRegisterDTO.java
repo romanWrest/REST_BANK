@@ -13,14 +13,6 @@ public class UserRegisterDTO {
     private String email;
 
     @NotNull
-    @Size(min = 3, max = 50)
-    private String fullName;
-
-    @NotNull
-    @Size(min = 10, max = 11)
-    private String phoneNumber;
-
-    @NotNull
     @Size(min = 8, message = "Длина пароля должна быть не менее 8 символов")
     private String password;
 }

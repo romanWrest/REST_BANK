@@ -1,0 +1,31 @@
+### create card
+POST http://localhost:8080/api/cards/create
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3NTQxNTA4MDh9.z2XoFLVs16nqTKWfqHv0nzSsbvNr7jyEyhLzdrZYzdjsTN3_zdq2oA48_TFsH6P9
+Content-Type: application/json
+{
+"number": "1234 5678 9012 3456",
+"owner": "user",
+"expiryDate": "2025-08-01",
+"balance": 100.0,
+"bank": "OneBank",
+"userId": 3
+}
+
+
+### get card
+GET http://localhost:8080/api/cards/3
+Authorization: Bearer eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbkBhZG1pbi5jb20iLCJleHAiOjE3NTQxNDM4NzJ9.b50-No98aFTOKA_-5O7Q6sxv8EH4Hv01DX7lBz67fL9JRcbA2p2We_8uTHg5DTS6
+Accept: application/json
+// это прогресс
+//Card not found
+//HTTP/1.1 404
+
+### Get token АДМИН, птмшто онли админ может create cards
+POST http://localhost:8080/auth/sing-in
+Content-Type: application/json
+
+{
+  "email": "admin@admin.com",
+  "fullName": "user",
+  "phoneNumber": "12345678901",
+  "password": "12345678"}

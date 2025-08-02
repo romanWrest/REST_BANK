@@ -1,6 +1,6 @@
 package com.example.bankcards.dto.Card;
 
-import com.example.bankcards.entity.enums.Banks;
+import com.example.bankcards.entity.enums.CardStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -13,23 +13,16 @@ import java.time.LocalDate;
 @Data
 public class CardCreateDTO {
     @NotNull
-    @Pattern(regexp = "\\d{16}", message = "Номер карты должен иметь размер 16 цифр")
+    @Pattern(regexp = "[0-9]{4} [0-9]{4} [0-9]{4} [0-9]{4}", message = "Номер карты должен быть в формате XXXX XXXX XXXX XXXX")
     private String number;
 
-    @NotNull
-    @Size(min = 3, max = 50)
-    private String owner;
-
-    @NotNull
-    private LocalDate expiryDate;
 
     @NotNull
     @PositiveOrZero
     private BigDecimal balance;
 
     @NotNull
-    private Banks bank;
-
-    @NotNull
     private Long userId;
+
+    private CardStatus status;
 }

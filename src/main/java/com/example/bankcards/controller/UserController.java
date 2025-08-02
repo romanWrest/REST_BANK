@@ -1,48 +1,44 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.User.UserDTO;
-import com.example.bankcards.dto.User.UserRegisterDTO;
 import com.example.bankcards.service.UserService;
-import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.net.URI;
 
 
 @RestController
-@RequestMapping("/users")
+@RequiredArgsConstructor
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
 
-
-    public UserController(UserService userService) {
-        this.userService = userService;
+    @GetMapping("/self")
+    public ResponseEntity<UserDTO> getCurrentUser() {
+        return ResponseEntity.ok(userService.getCurrentUser());
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
-        UserDTO userDTO = userService.registerUser(userRegisterDTO);
-        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
-    }
 
-    @GetMapping("/test")
-    public String test() {
-        return "Test OK";
-    }
     @GetMapping("/")
     public ResponseEntity<String> home() {
-        return ResponseEntity.ok("Bank Cards API Home");
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create("/auth/registration"))
+                .build();
     }
 
-    @GetMapping("/registration")
-    public ResponseEntity<String> showRegistrationForm() {
-        return ResponseEntity.ok("Registration endpoint for GET /api/users/registration");
-    }
+
     @GetMapping("/{id}")
-    public UserDTO getUser(@PathVariable("id") Long id) {
-        return userService.getUser(id);
+    public ResponseEntity<UserDTO> getUser(@PathVariable("id") Long id) {
+        UserDTO userDTO = userService.getUser(id);
+        return new ResponseEntity<>(userDTO, HttpStatus.FOUND);
     }
 
     @GetMapping

@@ -2,6 +2,7 @@ package com.example.bankcards.security;
 
 import com.example.bankcards.security.jwt.JwtFilter;
 import com.example.bankcards.mappers.CardMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,19 +29,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint((request, response, authException) -> {
+                                    response.setContentType("application/json");
+                                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                    response.getWriter().write("{\"error\": \"Unauthorized: " + authException.getMessage() + "\"}");
+                                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+                                }
+                        )
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(HttpServletResponse.SC_FORBIDDEN))
+                )
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/users/test",
-                                "/users/",
-                                "/users/registration",
-                                "/user/registration",
+                .authorizeHttpRequests(auth -> auth.requestMatchers(
+                                "/auth/registration",
                                 "/auth/**",
                                 "/").permitAll()
-                          .requestMatchers("/lol").authenticated())
+                        .requestMatchers(
+                                "/api/users/**",
+                                "self",
+                                "/api/cards/create",
+                                "/api/cards/{id}",
+                                "/api/cards/{id}/userCards",
+                                "/user/cards/by/status\""
+                        ).authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-    return http.build();
+        return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(8);
@@ -52,7 +70,6 @@ public class SecurityConfig {
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
         return authenticationManagerBuilder.build();
     }
-
 
 
 }

@@ -18,9 +18,5 @@ public class UserDTO {
     private String fullName;
 
     @NotNull
-    @Size(min = 10, max = 11)
-    private String phoneNumber;
-
-    @NotNull
     private RoleUsers role;
 }

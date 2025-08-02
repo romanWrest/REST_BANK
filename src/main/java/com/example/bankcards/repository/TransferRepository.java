@@ -9,5 +9,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TransferRepository extends JpaRepository<TransferEntity, Long> {
 
-    Page<TransferEntity> findByFromCardEntityUserId(Long userId, Pageable pageable);
 }

@@ -34,9 +34,6 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CardEntity> cardEntities = new ArrayList<>();
-    @Column(name = "phone_number", nullable = false)
-    @Size(min = 16, max = 255)
-    private String phoneNumber;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
