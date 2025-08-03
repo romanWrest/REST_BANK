@@ -4,12 +4,18 @@ import com.example.bankcards.entity.enums.BlockRequestStatus;
 import com.example.bankcards.entity.enums.CardStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.Data;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
 @Entity
+@FieldNameConstants
 @Table(name = "cards")
 public class CardEntity {
     @Id

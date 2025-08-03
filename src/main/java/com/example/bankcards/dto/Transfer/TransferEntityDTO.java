@@ -1,11 +1,13 @@
 package com.example.bankcards.dto.Transfer;
 
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@FieldNameConstants
 public class TransferEntityDTO {
     private Long userId;
 

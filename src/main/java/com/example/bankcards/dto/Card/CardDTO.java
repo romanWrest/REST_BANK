@@ -4,10 +4,12 @@ import com.example.bankcards.entity.enums.CardStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 
 @Data
+@FieldNameConstants
 public class CardDTO {
     @NotNull
     private Long id;

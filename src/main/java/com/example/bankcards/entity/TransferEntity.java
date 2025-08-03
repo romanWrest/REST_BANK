@@ -3,11 +3,13 @@ package com.example.bankcards.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@FieldNameConstants
 @Entity
 @Table(name = "transfers")
 public class TransferEntity {

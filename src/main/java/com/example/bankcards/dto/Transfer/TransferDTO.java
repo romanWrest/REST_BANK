@@ -2,10 +2,11 @@ package com.example.bankcards.dto.Transfer;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
+@FieldNameConstants
 @Data
 public class TransferDTO {
     @NotNull(message = "ID пользователя обязательно")
