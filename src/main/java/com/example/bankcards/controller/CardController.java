@@ -5,6 +5,12 @@ import com.example.bankcards.dto.Card.CardDTO;
 import com.example.bankcards.dto.Card.CardResponseBalanceDTO;
 import com.example.bankcards.dto.Card.CardResponseBlockDTO;
 import com.example.bankcards.service.CardService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -20,46 +26,78 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/cards")
+@Tag(name = "Card Management API", description = "API для управления банковскими картами пользователей")
+@SecurityRequirement(name = "bearerAuth")
 public class CardController {
     private static final Logger log = LogManager.getLogger(CardController.class);
     private final CardService cardService;
 
     @PostMapping("/create")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Operation(summary = "Создать новую карту", description = "Создаёт новую банковскую карту для пользователя. Доступно только администратору.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Карта успешно создана"),
+            @ApiResponse(responseCode = "400", description = "Неверные данные в запросе"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "409", description = "Карта с такими данными уже существует")
+    })
     public ResponseEntity<CardDTO> createCard(@Valid @RequestBody CardCreateDTO cardCreateDTO) {
         log.info("Received cardCreateDTO: {}", cardCreateDTO);
         CardDTO cardDTO = cardService.createCard(cardCreateDTO);
         return new ResponseEntity<>(cardDTO, HttpStatus.CREATED);
     }
 
-
     @GetMapping("/{id}")
-    public ResponseEntity<CardDTO> getCard(@PathVariable("id") Long id) {
+    @Operation(summary = "Получить карту по ID", description = "Возвращает информацию о карте по её ID. Доступно для авторизованных пользователей.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Карта успешно найдена"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Карта не найдена")
+    })
+    public ResponseEntity<CardDTO> getCard(
+            @Parameter(description = "ID карты", required = true) @PathVariable("id") Long id) {
         CardDTO cardDTO = cardService.getCard(id);
         return new ResponseEntity<>(cardDTO, HttpStatus.OK);
     }
 
     @GetMapping("/{id}/userCards")
-    public ResponseEntity<Page<CardDTO>> getUserCards(@PathVariable("id") Long id, @Valid @NotNull Pageable pageable) {
+    @Operation(summary = "Получить карты пользователя", description = "Возвращает список карт, принадлежащих пользователю, с пагинацией.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Список карт успешно получен"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Пользователь не найден")
+    })
+    public ResponseEntity<Page<CardDTO>> getUserCards(
+            @Parameter(description = "ID пользователя", required = true) @PathVariable("id") Long id,
+            @Parameter(description = "Параметры пагинации (page, size, sort)", required = true) @Valid @NotNull Pageable pageable) {
         Page<CardDTO> userCards = cardService.getUserCards(id, pageable);
         return new ResponseEntity<>(userCards, HttpStatus.OK);
     }
 
-
     @GetMapping("/{id}/balance")
-    public ResponseEntity<CardResponseBalanceDTO> getBalance(@PathVariable("id") Long id) {
+    @Operation(summary = "Получить баланс карты", description = "Возвращает баланс карты по её ID. Доступно для авторизованных пользователей.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Баланс карты успешно получен"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Карта не найдена")
+    })
+    public ResponseEntity<CardResponseBalanceDTO> getBalance(
+            @Parameter(description = "ID карты", required = true) @PathVariable("id") Long id) {
         CardResponseBalanceDTO cardResponseBalanceDTO = cardService.getBalanceCardByCardId(id);
         return new ResponseEntity<>(cardResponseBalanceDTO, HttpStatus.OK);
     }
 
     @PatchMapping("/block")
-    public ResponseEntity<CardResponseBlockDTO> requestToBlockCard(@PathVariable("id") Long id) {
+    @Operation(summary = "Запрос на блокировку карты", description = "Отправляет запрос на блокировку карты по её ID. Доступно для авторизованных пользователей.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Запрос на блокировку успешно отправлен"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Карта не найдена")
+    })
+    public ResponseEntity<CardResponseBlockDTO> requestToBlockCard(
+            @Parameter(description = "ID карты", required = true) @PathVariable("id") Long id) {
         log.info("Requesting block for card id: {}", id);
         CardResponseBlockDTO response = cardService.requestBlock(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
-
-
-
-
 }

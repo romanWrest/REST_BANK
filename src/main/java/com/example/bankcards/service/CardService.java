@@ -25,13 +25,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class CardService {
     private static final Logger log = LogManager.getLogger(CardService.class);
 
     private final CardRepository cardRepository;
     private final UserRepository userRepository;
     private final CardMapper cardMapper;
+
+    public CardService(CardRepository cardRepository, UserRepository userRepository, CardMapper cardMapper) {
+        this.cardRepository = cardRepository;
+        this.userRepository = userRepository;
+        this.cardMapper = cardMapper;
+        log.info("Иниуиализация сервисва CardService");
+    }
 
     @Transactional
     public CardDTO createCard(CardCreateDTO dto) {

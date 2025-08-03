@@ -5,9 +5,13 @@ import io.swagger.v3.oas.annotations.info.Contact;
 import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @SpringBootApplication
+/*
+@ComponentScan({"com.example.bankcards.controller."})
+*/
 @OpenAPIDefinition(
         info = @Info(
                 title = "Bank Card API",

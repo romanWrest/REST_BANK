@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import static com.example.bankcards.util.AuthUtils.isAdmin;
 
 @Service
-@RequiredArgsConstructor
 public class UserService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
