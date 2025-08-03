@@ -1,1 +1,1050 @@
-{"openapi":"3.0.1","info":{"title":"Bank Card API","description":"API for managing bank cards","contact":{"name":"Junior Dev Team","email":"dev@example.com"},"version":"1.0"},"servers":[{"url":"http://localhost:8080","description":"Generated server url"}],"security":[{"bearerAuth":[]}],"tags":[{"name":"Admin API","description":"API для администрирования банковских карт и пользователей"},{"name":"Card Management API","description":"API для управления банковскими картами пользователей"},{"name":"Authentication API","description":"API для аутентификации и регистрации пользователей"}],"paths":{"/api/transfer":{"post":{"tags":["transfer-controller"],"operationId":"transfer","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/TransferDTO"}}},"required":true},"responses":{"200":{"description":"OK","content":{"application/json":{"schema":{"$ref":"#/components/schemas/TransferEntityDTO"}}}}}}},"/api/cards/create":{"post":{"tags":["Card Management API"],"summary":"Создать новую карту","description":"Создаёт новую банковскую карту для пользователя. Доступно только администратору.","operationId":"createCard","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardCreateDTO"}}},"required":true},"responses":{"400":{"description":"Неверные данные в запросе","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardDTO"}}}},"409":{"description":"Карта с такими данными уже существует","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardDTO"}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardDTO"}}}},"201":{"description":"Карта успешно создана","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardDTO"}}}}},"security":[{"bearerAuth":[]}]}},"/api/auth/sign-in":{"post":{"tags":["Authentication API"],"summary":"Вход в систему","description":"Аутентифицирует пользователя и возвращает JWT-токен.","operationId":"signIn","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserRegisterDTO"}}},"required":true},"responses":{"200":{"description":"Успешная аутентификация, токен возвращён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/JwtAuthenticationDto"}}}},"400":{"description":"Неверные данные в запросе","content":{"application/json":{"schema":{"$ref":"#/components/schemas/JwtAuthenticationDto"}}}},"401":{"description":"Ошибка аутентификации","content":{"application/json":{"schema":{"$ref":"#/components/schemas/JwtAuthenticationDto"}}}}}}},"/api/auth/registration":{"post":{"tags":["Authentication API"],"summary":"Регистрация пользователя","description":"Регистрирует нового пользователя и возвращает данные пользователя.","operationId":"registerUser","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserRegisterDTO"}}},"required":true},"responses":{"400":{"description":"Неверные данные в запросе","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserDTO"}}}},"201":{"description":"Пользователь успешно зарегистрирован","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserDTO"}}}},"409":{"description":"Пользователь с такими данными уже существует","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserDTO"}}}}}}},"/api/auth/refresh-token":{"post":{"tags":["Authentication API"],"summary":"Обновление токена","description":"Обновляет JWT-токен на основе предоставленного refresh-токена.","operationId":"refresh","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/RefreshTokenDto"}}},"required":true},"responses":{"200":{"description":"Токен успешно обновлён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/JwtAuthenticationDto"}}}},"400":{"description":"Неверный refresh-токен","content":{"application/json":{"schema":{"$ref":"#/components/schemas/JwtAuthenticationDto"}}}},"401":{"description":"Ошибка авторизации","content":{"application/json":{"schema":{"$ref":"#/components/schemas/JwtAuthenticationDto"}}}}}}},"/api/cards/block":{"patch":{"tags":["Card Management API"],"summary":"Запрос на блокировку карты","description":"Отправляет запрос на блокировку карты по её ID. Доступно для авторизованных пользователей.","operationId":"requestToBlockCard","parameters":[],"responses":{"200":{"description":"Запрос на блокировку успешно отправлен","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardResponseBlockDTO"}}}},"404":{"description":"Карта не найдена","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardResponseBlockDTO"}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardResponseBlockDTO"}}}}},"security":[{"bearerAuth":[]}]}},"/api/admin/status":{"patch":{"tags":["Admin API"],"summary":"Изменить статус карты","description":"Позволяет администратору изменить статус банковской карты (например, активировать или заблокировать).","operationId":"setStatusCard","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardSetStatusDTO"}}},"required":true},"responses":{"400":{"description":"Неверные данные в запросе","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardSetStatusResponseDTO"}}}},"404":{"description":"Карта не найдена","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardSetStatusResponseDTO"}}}},"200":{"description":"Статус карты успешно изменён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardSetStatusResponseDTO"}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardSetStatusResponseDTO"}}}}},"security":[{"bearerAuth":[]}]}},"/api/users/{id}":{"get":{"tags":["user-controller"],"operationId":"getUser","parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"OK","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserDTO"}}}}}}},"/api/users/self":{"get":{"tags":["user-controller"],"operationId":"getCurrentUser","responses":{"200":{"description":"OK","content":{"application/json":{"schema":{"$ref":"#/components/schemas/UserDTO"}}}}}}},"/api/users/":{"get":{"tags":["user-controller"],"operationId":"home","responses":{"200":{"description":"OK","content":{"application/json":{"schema":{"type":"string"}}}}}}},"/api/cards/{id}":{"get":{"tags":["Card Management API"],"summary":"Получить карту по ID","description":"Возвращает информацию о карте по её ID. Доступно для авторизованных пользователей.","operationId":"getCard","parameters":[{"name":"id","in":"path","description":"ID карты","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"200":{"description":"Карта успешно найдена","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardDTO"}}}},"404":{"description":"Карта не найдена","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardDTO"}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardDTO"}}}}},"security":[{"bearerAuth":[]}]}},"/api/cards/{id}/userCards":{"get":{"tags":["Card Management API"],"summary":"Получить карты пользователя","description":"Возвращает список карт, принадлежащих пользователю, с пагинацией.","operationId":"getUserCards","parameters":[{"name":"id","in":"path","description":"ID пользователя","required":true,"schema":{"type":"integer","format":"int64"}},{"name":"pageable","in":"query","description":"Параметры пагинации (page, size, sort)","required":true,"schema":{"$ref":"#/components/schemas/Pageable"}}],"responses":{"404":{"description":"Пользователь не найден","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PageCardDTO"}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PageCardDTO"}}}},"200":{"description":"Список карт успешно получен","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PageCardDTO"}}}}},"security":[{"bearerAuth":[]}]}},"/api/cards/{id}/balance":{"get":{"tags":["Card Management API"],"summary":"Получить баланс карты","description":"Возвращает баланс карты по её ID. Доступно для авторизованных пользователей.","operationId":"getBalance","parameters":[{"name":"id","in":"path","description":"ID карты","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"404":{"description":"Карта не найдена","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardResponseBalanceDTO"}}}},"200":{"description":"Баланс карты успешно получен","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardResponseBalanceDTO"}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CardResponseBalanceDTO"}}}}},"security":[{"bearerAuth":[]}]}},"/api/admin/{id}/cards":{"get":{"tags":["Admin API"],"summary":"Получить статусы запросов на блокировку карт по запросам","description":"Возвращает список статусов запросов на блокировку карт по запросам с пагинацией.","operationId":"getStatusByRequestStatus","parameters":[{"name":"pageable","in":"query","description":"Параметры пагинации (page, size, sort)","required":true,"schema":{"$ref":"#/components/schemas/Pageable"}}],"responses":{"404":{"description":"Ресурс не найден","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PageCardResponseRequestStatusDTO"}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PageCardResponseRequestStatusDTO"}}}},"200":{"description":"Список статусов успешно получен","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PageCardResponseRequestStatusDTO"}}}}},"security":[{"bearerAuth":[]}]}},"/api/admin/users":{"get":{"tags":["Admin API"],"summary":"Получить всех пользователей","description":"Возвращает список всех пользователей с пагинацией.","operationId":"getAllUsers","parameters":[{"name":"pageable","in":"query","description":"Параметры пагинации (page, size, sort)","required":true,"schema":{"$ref":"#/components/schemas/Pageable"}}],"responses":{"200":{"description":"Список пользователей успешно получен","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PageUserDTO"}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"$ref":"#/components/schemas/PageUserDTO"}}}}},"security":[{"bearerAuth":[]}]}},"/api/admin/users/{id}/cards":{"get":{"tags":["Admin API"],"summary":"Получить карты пользователя","description":"Возвращает список карт, принадлежащих пользователю по его ID.","operationId":"getUserCards_1","parameters":[{"name":"id","in":"path","description":"ID пользователя","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"404":{"description":"Пользователь не найден","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/CardDTO"}}}}},"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/CardDTO"}}}}},"200":{"description":"Список карт пользователя успешно получен","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/CardDTO"}}}}}},"security":[{"bearerAuth":[]}]}},"/api/admin/cards":{"get":{"tags":["Admin API"],"summary":"Получить все карты всех пользователей","description":"Возвращает список абсолютно всех банковских карт с поддержкой пагинации.","operationId":"getAllCards","parameters":[{"name":"pageable","in":"query","description":"Параметры пагинации (page, size, sort)","required":true,"schema":{"$ref":"#/components/schemas/Pageable"}}],"responses":{"403":{"description":"Доступ запрещён","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/CardDTO"}}}}},"200":{"description":"Список карт успешно получен","content":{"application/json":{"schema":{"type":"array","items":{"$ref":"#/components/schemas/CardDTO"}}}}}},"security":[{"bearerAuth":[]}]}},"/api/admin/{id}":{"delete":{"tags":["Admin API"],"summary":"Удалить карту","description":"Удаляет банковскую карту по её ID.","operationId":"deleteCard","parameters":[{"name":"id","in":"path","description":"ID карты для удаления","required":true,"schema":{"type":"integer","format":"int64"}}],"responses":{"404":{"description":"Карта не найдена"},"204":{"description":"Карта успешно удалена"},"403":{"description":"Доступ запрещён"}},"security":[{"bearerAuth":[]}]}}},"components":{"schemas":{"TransferDTO":{"required":["amount","fromCardId","toCardId","transferTime","userId"],"type":"object","properties":{"userId":{"type":"integer","format":"int64"},"fromCardId":{"type":"integer","format":"int64"},"toCardId":{"type":"integer","format":"int64"},"amount":{"type":"number"},"transferTime":{"type":"string","format":"date-time"}}},"TransferEntityDTO":{"type":"object","properties":{"userId":{"type":"integer","format":"int64"},"fromCardId":{"type":"integer","format":"int64"},"toCardId":{"type":"integer","format":"int64"},"transferTime":{"type":"string","format":"date-time"},"amount":{"type":"number"}}},"CardCreateDTO":{"required":["balance","number","status","userId"],"type":"object","properties":{"number":{"maxLength":19,"minLength":16,"pattern":"^(\\d{4} ?){3}\\d{4}$","type":"string"},"balance":{"type":"number"},"userId":{"type":"integer","format":"int64"},"status":{"type":"string","enum":["ACTIVE","BLOCK","EXPIRED"]}}},"CardDTO":{"required":["balance","id","maskedNumber","status"],"type":"object","properties":{"id":{"type":"integer","format":"int64"},"maskedNumber":{"type":"string"},"balance":{"type":"number"},"status":{"type":"string","enum":["ACTIVE","BLOCK","EXPIRED"]}}},"UserRegisterDTO":{"required":["email","fullname","password"],"type":"object","properties":{"email":{"maxLength":255,"minLength":3,"type":"string"},"fullname":{"maxLength":255,"minLength":0,"type":"string"},"password":{"maxLength":20,"minLength":8,"type":"string"}}},"JwtAuthenticationDto":{"type":"object","properties":{"token":{"type":"string"},"refreshToken":{"type":"string"}}},"UserDTO":{"type":"object","properties":{"email":{"type":"string"},"fullName":{"type":"string"},"role":{"type":"string","enum":["ROLE_USER","ROLE_ADMIN"]}}},"RefreshTokenDto":{"type":"object","properties":{"refreshToken":{"type":"string"}}},"CardResponseBlockDTO":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"blockRequestStatus":{"type":"string","enum":["NONE","PENDING","APPROVED","REJECTED"]}}},"CardSetStatusDTO":{"required":["id","status"],"type":"object","properties":{"id":{"type":"integer","format":"int64"},"status":{"type":"string","enum":["ACTIVE","BLOCK","EXPIRED"]}}},"CardSetStatusResponseDTO":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"status":{"type":"string","enum":["ACTIVE","BLOCK","EXPIRED"]},"blockRequestStatus":{"type":"string","enum":["NONE","PENDING","APPROVED","REJECTED"]}}},"Pageable":{"type":"object","properties":{"page":{"minimum":0,"type":"integer","format":"int32"},"size":{"minimum":1,"type":"integer","format":"int32"},"sort":{"type":"array","items":{"type":"string"}}}},"PageCardDTO":{"type":"object","properties":{"totalElements":{"type":"integer","format":"int64"},"totalPages":{"type":"integer","format":"int32"},"size":{"type":"integer","format":"int32"},"content":{"type":"array","items":{"$ref":"#/components/schemas/CardDTO"}},"number":{"type":"integer","format":"int32"},"sort":{"type":"array","items":{"$ref":"#/components/schemas/SortObject"}},"first":{"type":"boolean"},"last":{"type":"boolean"},"numberOfElements":{"type":"integer","format":"int32"},"pageable":{"$ref":"#/components/schemas/PageableObject"},"empty":{"type":"boolean"}}},"PageableObject":{"type":"object","properties":{"offset":{"type":"integer","format":"int64"},"sort":{"type":"array","items":{"$ref":"#/components/schemas/SortObject"}},"paged":{"type":"boolean"},"pageNumber":{"type":"integer","format":"int32"},"pageSize":{"type":"integer","format":"int32"},"unpaged":{"type":"boolean"}}},"SortObject":{"type":"object","properties":{"direction":{"type":"string"},"nullHandling":{"type":"string"},"ascending":{"type":"boolean"},"property":{"type":"string"},"ignoreCase":{"type":"boolean"}}},"CardResponseBalanceDTO":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"balance":{"type":"number"}}},"CardEntity":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"number":{"type":"string"},"user":{"$ref":"#/components/schemas/UserEntity"},"balance":{"type":"number"},"blockRequestStatus":{"type":"string","enum":["NONE","PENDING","APPROVED","REJECTED"]},"status":{"type":"string","enum":["ACTIVE","BLOCK","EXPIRED"]}}},"CardResponseRequestStatusDTO":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"user":{"$ref":"#/components/schemas/UserEntity"},"blockRequestStatus":{"type":"string","enum":["NONE","PENDING","APPROVED","REJECTED"]},"status":{"type":"string","enum":["ACTIVE","BLOCK","EXPIRED"]}}},"PageCardResponseRequestStatusDTO":{"type":"object","properties":{"totalElements":{"type":"integer","format":"int64"},"totalPages":{"type":"integer","format":"int32"},"size":{"type":"integer","format":"int32"},"content":{"type":"array","items":{"$ref":"#/components/schemas/CardResponseRequestStatusDTO"}},"number":{"type":"integer","format":"int32"},"sort":{"type":"array","items":{"$ref":"#/components/schemas/SortObject"}},"first":{"type":"boolean"},"last":{"type":"boolean"},"numberOfElements":{"type":"integer","format":"int32"},"pageable":{"$ref":"#/components/schemas/PageableObject"},"empty":{"type":"boolean"}}},"UserEntity":{"type":"object","properties":{"id":{"type":"integer","format":"int64"},"email":{"type":"string"},"fullName":{"type":"string"},"password":{"type":"string"},"cardEntities":{"type":"array","items":{"$ref":"#/components/schemas/CardEntity"}},"role":{"type":"string","enum":["ROLE_USER","ROLE_ADMIN"]}}},"PageUserDTO":{"type":"object","properties":{"totalElements":{"type":"integer","format":"int64"},"totalPages":{"type":"integer","format":"int32"},"size":{"type":"integer","format":"int32"},"content":{"type":"array","items":{"$ref":"#/components/schemas/UserDTO"}},"number":{"type":"integer","format":"int32"},"sort":{"type":"array","items":{"$ref":"#/components/schemas/SortObject"}},"first":{"type":"boolean"},"last":{"type":"boolean"},"numberOfElements":{"type":"integer","format":"int32"},"pageable":{"$ref":"#/components/schemas/PageableObject"},"empty":{"type":"boolean"}}}},"securitySchemes":{"bearerAuth":{"type":"http","scheme":"bearer","bearerFormat":"JWT"}}}}
+openapi: 3.0.1
+info:
+  title: Bank Card API
+  description: API for managing bank cards
+  contact:
+    name: Junior Dev Team
+    email: dev@example.com
+  version: '1.0'
+servers:
+  - url: http://localhost:8080
+    description: Generated server url
+security:
+  - bearerAuth: []
+tags:
+  - name: Admin API
+    description: API для администрирования банковских карт и пользователей
+  - name: Transfer API
+    description: API для выполнения переводов между банковскими картами
+  - name: Card Management API
+    description: API для управления банковскими картами пользователей
+  - name: User API
+    description: API для управления информацией о пользователях
+  - name: Authentication API
+    description: API для аутентификации и регистрации пользователей
+paths:
+  /api/transfer:
+    post:
+      tags:
+        - Transfer API
+      summary: Выполнить перевод
+      description: Выполняет перевод средств между картами пользователя.
+      operationId: transfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferDTO'
+        required: true
+      responses:
+        '200':
+          description: Перевод успешно выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEntityDTO'
+        '400':
+          description: Неверные данные в запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEntityDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEntityDTO'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEntityDTO'
+        '422':
+          description: Недостаточно средств или карта заблокирована(BLOCK, EXPIRED)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransferEntityDTO'
+      security:
+        - bearerAuth: []
+  /api/cards/create:
+    post:
+      tags:
+        - Card Management API
+      summary: Создать новую карту
+      description: Создаёт новую банковскую карту для пользователя. Доступно только администратору.
+      operationId: createCard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardCreateDTO'
+        required: true
+      responses:
+        '201':
+          description: Карта успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTO'
+        '400':
+          description: Неверные данные в запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTO'
+        '409':
+          description: Карта с такими данными уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTO'
+      security:
+        - bearerAuth: []
+  /api/auth/sign-in:
+    post:
+      tags:
+        - Authentication API
+      summary: Вход в систему
+      description: Аутентифицирует пользователя и возвращает JWT-токен.
+      operationId: signIn
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterDTO'
+        required: true
+      responses:
+        '200':
+          description: Успешная аутентификация, токен возвращён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationDto'
+        '400':
+          description: Неверные данные в запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationDto'
+        '401':
+          description: Ошибка аутентификации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationDto'
+  /api/auth/registration:
+    post:
+      tags:
+        - Authentication API
+      summary: Регистрация пользователя
+      description: Регистрирует нового пользователя и возвращает данные пользователя.
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegisterDTO'
+        required: true
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '400':
+          description: Неверные данные в запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '409':
+          description: Пользователь с такими данными уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+  /api/auth/refresh-token:
+    post:
+      tags:
+        - Authentication API
+      summary: Обновление токена
+      description: Обновляет JWT-токен на основе предоставленного refresh-токена.
+      operationId: refresh
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenDto'
+        required: true
+      responses:
+        '200':
+          description: Токен успешно обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationDto'
+        '400':
+          description: Неверный refresh-токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationDto'
+        '401':
+          description: Ошибка авторизации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/JwtAuthenticationDto'
+  /api/cards/block:
+    patch:
+      tags:
+        - Card Management API
+      summary: Запрос на блокировку карты
+      description: Отправляет запрос на блокировку карты по её ID. Доступно для авторизованных пользователей.
+      operationId: requestToBlockCard
+      parameters: []
+      responses:
+        '200':
+          description: Запрос на блокировку успешно отправлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBlockDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBlockDTO'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBlockDTO'
+      security:
+        - bearerAuth: []
+  /api/admin/status:
+    patch:
+      tags:
+        - Admin API
+      summary: Изменить статус карты
+      description: Позволяет администратору изменить статус банковской карты (например, активировать или заблокировать).
+      operationId: setStatusCard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardSetStatusDTO'
+        required: true
+      responses:
+        '200':
+          description: Статус карты успешно изменён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardSetStatusResponseDTO'
+        '400':
+          description: Неверные данные в запросе
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardSetStatusResponseDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardSetStatusResponseDTO'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardSetStatusResponseDTO'
+      security:
+        - bearerAuth: []
+  /api/users/{id}:
+    get:
+      tags:
+        - User API
+      summary: Получить пользователя по ID
+      description: Возвращает информацию о пользователе по его ID.
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '302':
+          description: Информация о пользователе успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '401':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+      security:
+        - bearerAuth: []
+  /api/users/self:
+    get:
+      tags:
+        - User API
+      summary: Получить текущего пользователя
+      description: Возвращает информацию о текущем авторизованном пользователе.
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Информация о пользователе успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '401':
+          description: Пользователь не авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDTO'
+      security:
+        - bearerAuth: []
+  /api/users/:
+    get:
+      tags:
+        - User API
+      summary: Перейти на страницу регистрации
+      description: Перенаправляет на страницу регистрации пользователя.
+      operationId: home
+      responses:
+        '302':
+          description: Перенаправление на /auth/registration
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Неверный запрос
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/cards/{id}:
+    get:
+      tags:
+        - Card Management API
+      summary: Получить карту по ID
+      description: Возвращает информацию о карте по её ID. Доступно для авторизованных пользователей.
+      operationId: getCard
+      parameters:
+        - name: id
+          in: path
+          description: ID карты
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Карта успешно найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTO'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardDTO'
+      security:
+        - bearerAuth: []
+  /api/cards/{id}/userCards:
+    get:
+      tags:
+        - Card Management API
+      summary: Получить карты пользователя
+      description: Возвращает список карт, принадлежащих пользователю, с пагинацией.
+      operationId: getUserCards
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: pageable
+          in: query
+          description: Параметры пагинации (page, size, sort)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Список карт успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCardDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCardDTO'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCardDTO'
+      security:
+        - bearerAuth: []
+  /api/cards/{id}/balance:
+    get:
+      tags:
+        - Card Management API
+      summary: Получить баланс карты
+      description: Возвращает баланс карты по её ID. Доступно для авторизованных пользователей.
+      operationId: getBalance
+      parameters:
+        - name: id
+          in: path
+          description: ID карты
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Баланс карты успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBalanceDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBalanceDTO'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBalanceDTO'
+      security:
+        - bearerAuth: []
+  /api/admin/{id}/cards:
+    get:
+      tags:
+        - Admin API
+      summary: Получить статусы запросов на блокировку карт по запросам
+      description: Возвращает список статусов запросов на блокировку карт по запросам с пагинацией.
+      operationId: getStatusByRequestStatus
+      parameters:
+        - name: pageable
+          in: query
+          description: Параметры пагинации (page, size, sort)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Список статусов успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCardResponseRequestStatusDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCardResponseRequestStatusDTO'
+        '404':
+          description: Ресурс не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCardResponseRequestStatusDTO'
+      security:
+        - bearerAuth: []
+  /api/admin/users:
+    get:
+      tags:
+        - Admin API
+      summary: Получить всех пользователей
+      description: Возвращает список всех пользователей с пагинацией.
+      operationId: getAllUsers
+      parameters:
+        - name: pageable
+          in: query
+          description: Параметры пагинации (page, size, sort)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Список пользователей успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageUserDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageUserDTO'
+      security:
+        - bearerAuth: []
+  /api/admin/users/{id}/cards:
+    get:
+      tags:
+        - Admin API
+      summary: Получить карты пользователя
+      description: Возвращает список карт, принадлежащих пользователю по его ID.
+      operationId: getUserCards_1
+      parameters:
+        - name: id
+          in: path
+          description: ID пользователя
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Список карт пользователя успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDTO'
+        '404':
+          description: Пользователь не найден
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDTO'
+      security:
+        - bearerAuth: []
+  /api/admin/cards:
+    get:
+      tags:
+        - Admin API
+      summary: Получить все карты всех пользователей
+      description: Возвращает список абсолютно всех банковских карт с поддержкой пагинации.
+      operationId: getAllCards
+      parameters:
+        - name: pageable
+          in: query
+          description: Параметры пагинации (page, size, sort)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
+      responses:
+        '200':
+          description: Список карт успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CardDTO'
+      security:
+        - bearerAuth: []
+  /api/admin/{id}:
+    delete:
+      tags:
+        - Admin API
+      summary: Удалить карту
+      description: Удаляет банковскую карту по её ID.
+      operationId: deleteCard
+      parameters:
+        - name: id
+          in: path
+          description: ID карты для удаления
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Карта успешно удалена
+        '403':
+          description: Доступ запрещён
+        '404':
+          description: Карта не найдена
+      security:
+        - bearerAuth: []
+components:
+  schemas:
+    TransferDTO:
+      required:
+        - amount
+        - fromCardId
+        - toCardId
+        - transferTime
+        - userId
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        fromCardId:
+          type: integer
+          format: int64
+        toCardId:
+          type: integer
+          format: int64
+        amount:
+          type: number
+        transferTime:
+          type: string
+          format: date-time
+    TransferEntityDTO:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        fromCardId:
+          type: integer
+          format: int64
+        toCardId:
+          type: integer
+          format: int64
+        transferTime:
+          type: string
+          format: date-time
+        amount:
+          type: number
+    CardCreateDTO:
+      required:
+        - balance
+        - number
+        - status
+        - userId
+      type: object
+      properties:
+        number:
+          maxLength: 19
+          minLength: 16
+          pattern: ^(\d{4} ?){3}\d{4}$
+          type: string
+        balance:
+          type: number
+        userId:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - BLOCK
+            - EXPIRED
+    CardDTO:
+      required:
+        - balance
+        - id
+        - maskedNumber
+        - status
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        maskedNumber:
+          type: string
+        balance:
+          type: number
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - BLOCK
+            - EXPIRED
+    UserRegisterDTO:
+      required:
+        - email
+        - fullname
+        - password
+      type: object
+      properties:
+        email:
+          maxLength: 255
+          minLength: 3
+          type: string
+        fullname:
+          maxLength: 255
+          minLength: 0
+          type: string
+        password:
+          maxLength: 20
+          minLength: 8
+          type: string
+    JwtAuthenticationDto:
+      type: object
+      properties:
+        token:
+          type: string
+        refreshToken:
+          type: string
+    UserDTO:
+      type: object
+      properties:
+        email:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+          enum:
+            - ROLE_USER
+            - ROLE_ADMIN
+    RefreshTokenDto:
+      type: object
+      properties:
+        refreshToken:
+          type: string
+    CardResponseBlockDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        blockRequestStatus:
+          type: string
+          enum:
+            - NONE
+            - PENDING
+            - APPROVED
+            - REJECTED
+    CardSetStatusDTO:
+      required:
+        - id
+        - status
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - BLOCK
+            - EXPIRED
+    CardSetStatusResponseDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - BLOCK
+            - EXPIRED
+        blockRequestStatus:
+          type: string
+          enum:
+            - NONE
+            - PENDING
+            - APPROVED
+            - REJECTED
+    Pageable:
+      type: object
+      properties:
+        page:
+          minimum: 0
+          type: integer
+          format: int32
+        size:
+          minimum: 1
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            type: string
+    PageCardDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardDTO'
+        number:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        direction:
+          type: string
+        nullHandling:
+          type: string
+        ascending:
+          type: boolean
+        property:
+          type: string
+        ignoreCase:
+          type: boolean
+    CardResponseBalanceDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        balance:
+          type: number
+    CardEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        number:
+          type: string
+        user:
+          $ref: '#/components/schemas/UserEntity'
+        balance:
+          type: number
+        blockRequestStatus:
+          type: string
+          enum:
+            - NONE
+            - PENDING
+            - APPROVED
+            - REJECTED
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - BLOCK
+            - EXPIRED
+    CardResponseRequestStatusDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        user:
+          $ref: '#/components/schemas/UserEntity'
+        blockRequestStatus:
+          type: string
+          enum:
+            - NONE
+            - PENDING
+            - APPROVED
+            - REJECTED
+        status:
+          type: string
+          enum:
+            - ACTIVE
+            - BLOCK
+            - EXPIRED
+    PageCardResponseRequestStatusDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardResponseRequestStatusDTO'
+        number:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    UserEntity:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        email:
+          type: string
+        fullName:
+          type: string
+        password:
+          type: string
+        cardEntities:
+          type: array
+          items:
+            $ref: '#/components/schemas/CardEntity'
+        role:
+          type: string
+          enum:
+            - ROLE_USER
+            - ROLE_ADMIN
+    PageUserDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDTO'
+        number:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
