@@ -36,7 +36,7 @@ public class AdminController {
     private final UserService userService;
 
     @PatchMapping("/status")
-    @Operation(summary = "Изменить статус карты", description = "Позволяет администратору изменить статус банковской карты (например, активировать или заблокировать).")
+    @Operation(summary = "Изменить статус карты", description = "Позволяет администратору изменить статус банковской карты (ACTIVE, BLOCK, EXPIRED).")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Статус карты успешно изменён"),
             @ApiResponse(responseCode = "400", description = "Неверные данные в запросе"),
