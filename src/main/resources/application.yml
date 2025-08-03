@@ -36,7 +36,20 @@ logging:
 
 encryption:
   key: c362b68d0793bd37b7b5252f250d4abbe02e671cd98d725d73d63bfd2ca3bda3417c7443
-
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    url: /v3/api-docs.yaml
+    operations-sorter: alpha
+    tags-sorter: alpha
+    doc-expansion: none
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  cache:
+    disabled: true
   #Что нужно сделать:
   # - Указать настройки подключения к базе данных.
   #- Указать порт приложения.

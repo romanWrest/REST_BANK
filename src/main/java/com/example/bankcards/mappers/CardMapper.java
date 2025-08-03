@@ -2,6 +2,7 @@ package com.example.bankcards.mappers;
 
 import com.example.bankcards.dto.Card.CardCreateDTO;
 import com.example.bankcards.dto.Card.CardDTO;
+import com.example.bankcards.dto.Card.CardResponseRequestStatusDTO;
 import com.example.bankcards.entity.CardEntity;
 import com.example.bankcards.util.MaskingUtil;
 import org.mapstruct.Mapper;
@@ -30,4 +31,9 @@ public interface CardMapper {
     })
     CardEntity toEntity(CardCreateDTO dto);
 
+    @Mappings({
+         //   @Mapping(source = "number", target = "number", ignore = true), // указанных target нет в итоговом DTO
+         //   @Mapping(source = "balance", target = "balance", ignore = true)// но так требует mapstruct
+    })
+    CardResponseRequestStatusDTO toCardResponseRequestStatusDTO(CardEntity cardEntity);
 }

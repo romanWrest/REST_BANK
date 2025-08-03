@@ -13,3 +13,4 @@ public class CardResponseBlockDTO {
         this.blockRequestStatus = blockRequestStatus;
     }
 }
+// DTO на выход, данные из БД валидны

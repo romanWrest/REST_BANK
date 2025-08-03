@@ -1,6 +1,5 @@
 package com.example.bankcards.entity;
 
-import com.example.bankcards.entity.enums.Banks;
 import com.example.bankcards.entity.enums.BlockRequestStatus;
 import com.example.bankcards.entity.enums.CardStatus;
 import jakarta.persistence.*;
@@ -8,7 +7,6 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Data
 @Entity

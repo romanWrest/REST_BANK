@@ -1,7 +1,6 @@
 package com.example.bankcards.security;
 
 import com.example.bankcards.security.jwt.JwtFilter;
-import com.example.bankcards.mappers.CardMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -45,7 +44,12 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
                                 "/auth/registration",
                                 "/auth/**",
-                                "/").permitAll()
+                                "/",
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/api-docs.yaml",
+                                "/v3/api-docs.yaml").permitAll()
                         .requestMatchers(
                                 "/api/users/**",
                                 "self",

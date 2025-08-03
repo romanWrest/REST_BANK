@@ -1,22 +1,17 @@
 package com.example.bankcards.dto.User;
 
 import com.example.bankcards.entity.enums.RoleUsers;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
 public class UserDTO {
-    @NotNull
-    @Email
-    @Size(min = 3, max = 50)
+
     private String email;
 
-    @NotNull
-    @Size(min = 3, max = 50)
     private String fullName;
 
-    @NotNull
     private RoleUsers role;
 }
+
+//Отсутсвие валидации обосновывается тем, что это DTO предназначено на выход
+// а данные из БД уже валидны

@@ -6,3 +6,5 @@ import lombok.Data;
 public class RefreshTokenDto {
     private String refreshToken;
 }
+
+// тут пока хз, завтра выяснить че там вообще в jwt происходит

@@ -23,10 +23,10 @@ public class AuthController {
 
     private final UserService userService;
 
-    @PostMapping("/sing-in")
-    public ResponseEntity<JwtAuthenticationDto> singIn(@RequestBody UserRegisterDTO userRegisterDTO) {
+    @PostMapping("/sign-in")
+    public ResponseEntity<JwtAuthenticationDto> signIn(@Valid @RequestBody UserRegisterDTO userRegisterDTO) {
         try {
-            JwtAuthenticationDto jwtAuthenticationDto = userService.singIn(userRegisterDTO);
+            JwtAuthenticationDto jwtAuthenticationDto = userService.signIn(userRegisterDTO);
             log.info("Generated JWT token: {}", jwtAuthenticationDto.getToken());
             return ResponseEntity.ok(jwtAuthenticationDto);
         } catch (AuthenticationException e) {

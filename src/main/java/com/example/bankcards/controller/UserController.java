@@ -1,10 +1,9 @@
 package com.example.bankcards.controller;
 
+import com.example.bankcards.dto.Card.CardDTO;
 import com.example.bankcards.dto.User.UserDTO;
 import com.example.bankcards.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.List;
 
 
 @RestController
@@ -34,16 +34,11 @@ public class UserController {
                 .build();
     }
 
-
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable("id") Long id) {
         UserDTO userDTO = userService.getUser(id);
         return new ResponseEntity<>(userDTO, HttpStatus.FOUND);
     }
+    //
 
-    @GetMapping
-    public ResponseEntity<Page<UserDTO>> getAllUsers(Pageable pageable) {
-        Page<UserDTO> users = userService.getAllUsers(pageable);
-        return new ResponseEntity<>(users, HttpStatus.OK);
-    }
 }

@@ -48,9 +48,17 @@ class EnumValidatorConstraint implements ConstraintValidator<ValidEnum, Enum<?>>
 
     @Override
     public boolean isValid(Enum<?> value, ConstraintValidatorContext context) {
-        if (value == null) {
-            return true; // @NotNull проверит null отдельно
+        if (value == null) { // говорят что аннотацию @NotNull кто-то может случайно удалить, поэтому проверим дважды
+            return false;
         }
         return allowedValues.contains(value.name());
     }
 }
+
+
+/*
++----------------------+----------------------------------+------+-----+---------+----------------+
+        | Field                | Type                             | Null | Key | Default | Extra          |
+        +----------------------+----------------------------------+------+-----+---------+----------------+
+        | status               | enum('ACTIVE','BLOCK','EXPIRED') | NO   |     | NULL    |                |
+*/

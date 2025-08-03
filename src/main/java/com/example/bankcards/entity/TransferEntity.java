@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "transfer")
+@Table(name = "transfers")
 public class TransferEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,12 +19,13 @@ public class TransferEntity {
     @Column(name = "TransferTime", nullable = false)
     private LocalDateTime transferTime;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "from_card_id", nullable = false)
-    private Long fromCardIdEntity;
+    private CardEntity fromCard;
 
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_card_id", nullable = false)
-    private Long toCardIdEntity;
-
+    private CardEntity toCard;
     @Column(name = "amount", nullable = false)
     @Positive
     private BigDecimal amount;

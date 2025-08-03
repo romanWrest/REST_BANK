@@ -36,11 +36,7 @@ public class CustomExceptionHandler {
         return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(DuplicateResourceException.class)
-    public ResponseEntity<Map<String, String>> handleDuplicateResourceException(DuplicateResourceException ex) {
-        log.error("Duplicate resource: {}", ex.getMessage(), ex);
-        return new ResponseEntity<>(Map.of("error", ex.getMessage()), HttpStatus.CONFLICT);
-    }
+
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, String>> handleAccessDeniedException(AccessDeniedException ex) {

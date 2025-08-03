@@ -8,3 +8,4 @@ import java.time.LocalDateTime;
 public class TransferResponseDTO {
     private LocalDateTime localDateTime;
 }
+// DTO на выход, данные из БД валидны

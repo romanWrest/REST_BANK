@@ -6,6 +6,7 @@ import com.example.bankcards.dto.Card.CardResponseBalanceDTO;
 import com.example.bankcards.dto.Card.CardResponseBlockDTO;
 import com.example.bankcards.service.CardService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,29 +40,26 @@ public class CardController {
     }
 
     @GetMapping("/{id}/userCards")
-    public ResponseEntity<Page<CardDTO>> getUserCards(@PathVariable("id") Long id, Pageable pageable) {
+    public ResponseEntity<Page<CardDTO>> getUserCards(@PathVariable("id") Long id, @Valid @NotNull Pageable pageable) {
         Page<CardDTO> userCards = cardService.getUserCards(id, pageable);
         return new ResponseEntity<>(userCards, HttpStatus.OK);
     }
 
 
-    @GetMapping("/balance")
+    @GetMapping("/{id}/balance")
     public ResponseEntity<CardResponseBalanceDTO> getBalance(@PathVariable("id") Long id) {
         CardResponseBalanceDTO cardResponseBalanceDTO = cardService.getBalanceCardByCardId(id);
         return new ResponseEntity<>(cardResponseBalanceDTO, HttpStatus.OK);
     }
 
-    @PostMapping("/block")
+    @PatchMapping("/block")
     public ResponseEntity<CardResponseBlockDTO> requestToBlockCard(@PathVariable("id") Long id) {
         log.info("Requesting block for card id: {}", id);
         CardResponseBlockDTO response = cardService.requestBlock(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCard(@PathVariable("id") Long id) {
-        cardService.deleteCard(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
+
+
+
 }
