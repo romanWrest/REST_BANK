@@ -10,7 +10,6 @@ import com.example.bankcards.exception.ResourceNotFoundException;
 import com.example.bankcards.mappers.CardMapper;
 import com.example.bankcards.repository.CardRepository;
 import com.example.bankcards.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
@@ -121,17 +120,16 @@ public class CardService {
     }
 
     @Transactional
-    public CardSetStatusResponseDTO setStatusCard(CardSetStatusDTO cardSetStatusDTO) {
-        log.debug("Попытка установки статуса для карты с ID: {} на статус: {}",
-                cardSetStatusDTO.getId(), cardSetStatusDTO.getStatus());
+    public CardSetStatusResponseDTO setStatusCard(Long id, CardStatus status) {
+        log.debug("Попытка установки статуса для карты с ID: {} на статус: {}", id, status);
 
-        CardEntity cardEntity = cardRepository.findById(cardSetStatusDTO.getId())
+        CardEntity cardEntity = cardRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.error("Карта с ID: {} не найдена", cardSetStatusDTO.getId());
+                    log.error("Карта с ID: {} не найдена", id);
                     return new RuntimeException("Карта не найдена");
                 });
 
-        cardEntity.setStatus(cardSetStatusDTO.getStatus());
+        cardEntity.setStatus(status);
         cardEntity.setBlockRequestStatus(BlockRequestStatus.APPROVED);
         cardEntity = cardRepository.save(cardEntity);
 

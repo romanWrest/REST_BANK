@@ -2,9 +2,9 @@ package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.Card.CardDTO;
 import com.example.bankcards.dto.Card.CardResponseRequestStatusDTO;
-import com.example.bankcards.dto.Card.CardSetStatusDTO;
 import com.example.bankcards.dto.Card.CardSetStatusResponseDTO;
 import com.example.bankcards.dto.User.UserDTO;
+import com.example.bankcards.entity.enums.CardStatus;
 import com.example.bankcards.service.CardService;
 import com.example.bankcards.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,8 +44,9 @@ public class AdminController {
             @ApiResponse(responseCode = "404", description = "Карта не найдена")
     })
     public ResponseEntity<CardSetStatusResponseDTO> setStatusCard(
-            @Valid @RequestBody CardSetStatusDTO cardSetStatusDTO) {
-        CardSetStatusResponseDTO cardSetStatusResponseDTO = cardService.setStatusCard(cardSetStatusDTO);
+            @RequestParam @NotNull Long id,
+            @RequestParam @NotNull CardStatus status) {
+        CardSetStatusResponseDTO cardSetStatusResponseDTO = cardService.setStatusCard(id, status);
         return new ResponseEntity<>(cardSetStatusResponseDTO, HttpStatus.OK);
     }
 
