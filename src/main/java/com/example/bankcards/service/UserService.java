@@ -79,7 +79,8 @@ public class UserService {
 
         log.debug("Создание сущности пользователя для email: {}", dto.getEmail());
         UserEntity userEntity = userMapper.toEntity(dto, passwordEncoder);
-        userEntity.setRole(RoleUsers.ROLE_USER);
+        //userEntity.setRole(RoleUsers.ROLE_USER);
+        //userEntity.setRole(RoleUsers.ROLE_ADMIN);
         userEntity.setFullName(dto.getFullname());
         userEntity = userRepository.save(userEntity);
         log.info("Пользователь успешно зарегистрирован, email: {}, ID: {}", dto.getEmail(), userEntity.getId());
