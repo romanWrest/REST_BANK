@@ -8,6 +8,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @RequiredArgsConstructor
+@Accessors(chain = true)
 @Entity
 @Table(name = "cards")
 @Hidden
@@ -45,6 +47,5 @@ public class CardEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private CardStatus status;
-
 
 }

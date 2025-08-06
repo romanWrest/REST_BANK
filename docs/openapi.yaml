@@ -4,7 +4,6 @@ info:
   description: API for managing bank cards
   contact:
     name: Junior Dev Team
-    email: dev@example.com
   version: '1.0'
 servers:
   - url: http://localhost:8080
@@ -12,8 +11,6 @@ servers:
 security:
   - bearerAuth: []
 tags:
-  - name: Admin API
-    description: API для администрирования банковских карт и пользователей
   - name: Transfer API
     description: API для выполнения переводов между банковскими картами
   - name: Card Management API
@@ -42,31 +39,25 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransferEntityDTO'
+                $ref: '#/components/schemas/TransferResponseDTO'
         '400':
-          description: Неверные данные в запросе
+          description: Недостаточно средств или карта заблокирована(BLOCK, EXPIRED)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransferEntityDTO'
+                $ref: '#/components/schemas/TransferResponseDTO'
         '403':
           description: Доступ запрещён
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransferEntityDTO'
+                $ref: '#/components/schemas/TransferResponseDTO'
         '404':
           description: Карта не найдена
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TransferEntityDTO'
-        '422':
-          description: Недостаточно средств или карта заблокирована(BLOCK, EXPIRED)
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TransferEntityDTO'
+                $ref: '#/components/schemas/TransferResponseDTO'
       security:
         - bearerAuth: []
   /api/cards/create:
@@ -120,7 +111,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserRegisterDTO'
+              $ref: '#/components/schemas/UserSignInDTO'
         required: true
       responses:
         '200':
@@ -205,48 +196,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/JwtAuthenticationDto'
-  /api/cards/block:
+  /api/cards/status:
     patch:
       tags:
         - Card Management API
-      summary: Запрос на блокировку карты
-      description: Отправляет запрос на блокировку карты по её ID. Доступно для авторизованных пользователей.
-      operationId: requestToBlockCard
-      parameters: []
-      responses:
-        '200':
-          description: Запрос на блокировку успешно отправлен
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CardResponseBlockDTO'
-        '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CardResponseBlockDTO'
-        '404':
-          description: Карта не найдена
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CardResponseBlockDTO'
-      security:
-        - bearerAuth: []
-  /api/admin/status:
-    patch:
-      tags:
-        - Admin API
       summary: Изменить статус карты
-      description: Позволяет администратору изменить статус банковской карты (например, активировать или заблокировать).
+      description: Позволяет администратору изменить статус банковской карты (ACTIVE, BLOCK, EXPIRED).
       operationId: setStatusCard
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CardSetStatusDTO'
-        required: true
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - ACTIVE
+              - BLOCK
+              - EXPIRED
       responses:
         '200':
           description: Статус карты успешно изменён
@@ -274,12 +246,48 @@ paths:
                 $ref: '#/components/schemas/CardSetStatusResponseDTO'
       security:
         - bearerAuth: []
+  /api/cards/block/{id}:
+    patch:
+      tags:
+        - Card Management API
+      summary: Запрос на блокировку карты
+      description: Отправляет запрос на блокировку карты по её ID. Доступно для авторизованных пользователей.
+      operationId: requestToBlockCard
+      parameters:
+        - name: id
+          in: path
+          description: ID карты
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Запрос на блокировку успешно отправлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBlockDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBlockDTO'
+        '404':
+          description: Карта не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CardResponseBlockDTO'
+      security:
+        - bearerAuth: []
   /api/users/{id}:
     get:
       tags:
         - User API
       summary: Получить пользователя по ID
-      description: Возвращает информацию о пользователе по его ID.
+      description: Возвращает информацию о пользователе по его ID. Доступно только администратору.
       operationId: getUser
       parameters:
         - name: id
@@ -290,7 +298,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '302':
+        '200':
           description: Информация о пользователе успешно получена
           content:
             application/json:
@@ -344,26 +352,41 @@ paths:
                 $ref: '#/components/schemas/UserDTO'
       security:
         - bearerAuth: []
-  /api/users/:
+  /api/users/all:
     get:
       tags:
         - User API
-      summary: Перейти на страницу регистрации
-      description: Перенаправляет на страницу регистрации пользователя.
-      operationId: home
+      summary: Получить всех пользователей
+      description: Возвращает список всех пользователей с пагинацией. Доступно только администратору.
+      operationId: getAllUsers
+      parameters:
+        - name: pageable
+          in: query
+          description: Параметры пагинации (page, size, sort)
+          required: true
+          schema:
+            $ref: '#/components/schemas/Pageable'
       responses:
-        '302':
-          description: Перенаправление на /auth/registration
+        '200':
+          description: Список пользователей успешно получен
           content:
             application/json:
               schema:
-                type: string
-        '400':
-          description: Неверный запрос
+                $ref: '#/components/schemas/PageUserDTO'
+        '401':
+          description: Пользователь не авторизован
           content:
             application/json:
               schema:
-                type: string
+                $ref: '#/components/schemas/PageUserDTO'
+        '403':
+          description: Доступ запрещён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageUserDTO'
+      security:
+        - bearerAuth: []
   /api/cards/{id}:
     get:
       tags:
@@ -405,7 +428,7 @@ paths:
       tags:
         - Card Management API
       summary: Получить карты пользователя
-      description: Возвращает список карт, принадлежащих пользователю, с пагинацией.
+      description: Возвращает список карт, принадлежащих пользователю, с пагинацией. Доступно только администратору.
       operationId: getUserCards
       parameters:
         - name: id
@@ -417,7 +440,7 @@ paths:
             format: int64
         - name: pageable
           in: query
-          description: Параметры пагинации (page, size, sort)
+          description: Возвращает список карт, принадлежащих авторизованному пользователю, с пагинацией.
           required: true
           schema:
             $ref: '#/components/schemas/Pageable'
@@ -478,12 +501,12 @@ paths:
                 $ref: '#/components/schemas/CardResponseBalanceDTO'
       security:
         - bearerAuth: []
-  /api/admin/{id}/cards:
+  /api/cards/statuses/request/cards:
     get:
       tags:
-        - Admin API
-      summary: Получить статусы запросов на блокировку карт по запросам
-      description: Возвращает список статусов запросов на блокировку карт по запросам с пагинацией.
+        - Card Management API
+      summary: Получить статусы запросов на блокировку карт
+      description: Возвращает список статусов запросов на блокировку карт с пагинацией. Доступно только администратору.
       operationId: getStatusByRequestStatus
       parameters:
         - name: pageable
@@ -513,83 +536,12 @@ paths:
                 $ref: '#/components/schemas/PageCardResponseRequestStatusDTO'
       security:
         - bearerAuth: []
-  /api/admin/users:
+  /api/cards/all:
     get:
       tags:
-        - Admin API
-      summary: Получить всех пользователей
-      description: Возвращает список всех пользователей с пагинацией.
-      operationId: getAllUsers
-      parameters:
-        - name: pageable
-          in: query
-          description: Параметры пагинации (page, size, sort)
-          required: true
-          schema:
-            $ref: '#/components/schemas/Pageable'
-      responses:
-        '200':
-          description: Список пользователей успешно получен
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PageUserDTO'
-        '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PageUserDTO'
-      security:
-        - bearerAuth: []
-  /api/admin/users/{id}/cards:
-    get:
-      tags:
-        - Admin API
-      summary: Получить карты пользователя
-      description: Возвращает список карт, принадлежащих пользователю по его ID.
-      operationId: getUserCards_1
-      parameters:
-        - name: id
-          in: path
-          description: ID пользователя
-          required: true
-          schema:
-            type: integer
-            format: int64
-      responses:
-        '200':
-          description: Список карт пользователя успешно получен
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CardDTO'
-        '403':
-          description: Доступ запрещён
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CardDTO'
-        '404':
-          description: Пользователь не найден
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CardDTO'
-      security:
-        - bearerAuth: []
-  /api/admin/cards:
-    get:
-      tags:
-        - Admin API
+        - Card Management API
       summary: Получить все карты всех пользователей
-      description: Возвращает список абсолютно всех банковских карт с поддержкой пагинации.
+      description: Возвращает список абсолютно всех банковских карт с поддержкой пагинации. Доступно только администратору.
       operationId: getAllCards
       parameters:
         - name: pageable
@@ -604,25 +556,21 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CardDTO'
+                $ref: '#/components/schemas/PageCardDTO'
         '403':
           description: Доступ запрещён
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/CardDTO'
+                $ref: '#/components/schemas/PageCardDTO'
       security:
         - bearerAuth: []
-  /api/admin/{id}:
+  /api/cards/delete/{id}:
     delete:
       tags:
-        - Admin API
+        - Card Management API
       summary: Удалить карту
-      description: Удаляет банковскую карту по её ID.
+      description: Удаляет банковскую карту по её ID. Доступно только администратору.
       operationId: deleteCard
       parameters:
         - name: id
@@ -648,41 +596,53 @@ components:
         - amount
         - fromCardId
         - toCardId
-        - transferTime
         - userId
       type: object
       properties:
         userId:
           type: integer
+          description: ID пользователя, инициирующего перевод
           format: int64
+          example: 1
         fromCardId:
           type: integer
+          description: ID карты, с которой выполняется перевод
           format: int64
+          example: 101
         toCardId:
           type: integer
+          description: ID карты, на которую выполняется перевод
           format: int64
+          example: 102
         amount:
           type: number
-        transferTime:
-          type: string
-          format: date-time
-    TransferEntityDTO:
+          description: Сумма перевода
+          example: 500
+      description: DTO для выполнения перевода между банковскими картами
+    TransferResponseDTO:
       type: object
       properties:
-        userId:
+        id:
           type: integer
+          description: Идентификатор трансфера
           format: int64
-        fromCardId:
-          type: integer
-          format: int64
-        toCardId:
-          type: integer
-          format: int64
+          example: 1
         transferTime:
           type: string
+          description: Время трансфера
           format: date-time
+        fromCard:
+          type: integer
+          description: Карта отправителя
+          format: int64
+        toCard:
+          type: integer
+          description: Карта получателя
+          format: int64
         amount:
           type: number
+          description: Сумма трансфера
+          example: 100.5
     CardCreateDTO:
       required:
         - balance
@@ -696,20 +656,30 @@ components:
           minLength: 16
           pattern: ^(\d{4} ?){3}\d{4}$
           type: string
+          description: Номер карты (16 цифр, с пробелами или без)
+          example: 1234 5678 9012 3456
         balance:
           type: number
+          description: Начальный баланс карты 100
+          example: 100
         userId:
           type: integer
+          description: ID пользователя-владельца карты
           format: int64
+          example: 1
         status:
           type: string
+          description: Статус карты
+          example: ACTIVE
           enum:
             - ACTIVE
             - BLOCK
             - EXPIRED
+      description: DTO для создания новой банковской карты
     CardDTO:
       required:
         - balance
+        - expiryDate
         - id
         - maskedNumber
         - status
@@ -717,17 +687,65 @@ components:
       properties:
         id:
           type: integer
+          description: ID карты
           format: int64
+          example: 101
         maskedNumber:
           type: string
+          description: Маскированный номер карты
+          example: '**** **** **** 1234'
         balance:
           type: number
+          description: Баланс карты
+          example: 1000
+        expiryDate:
+          type: string
+          description: Срок действия карты
+          format: date
+          example: '2025-12-31'
         status:
           type: string
+          description: Статус карты
+          example: ACTIVE
           enum:
             - ACTIVE
             - BLOCK
             - EXPIRED
+      description: DTO для представления информации о банковской карте
+    UserSignInDTO:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          maxLength: 20
+          minLength: 3
+          type: string
+          description: Email пользователя
+          example: testuser@example.com
+        password:
+          maxLength: 20
+          minLength: 8
+          type: string
+          description: Пароль пользователя
+          example: password123
+      description: DTO для входа пользователя
+    JwtAuthenticationDto:
+      required:
+        - refreshToken
+        - token
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT-токен (алгоритм HS384, содержит sub, role, exp)
+          example: eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJ0ZXN0dXNlckBleGFtcGxlLmNvbSIsInJvbGUiOiJST0xFX1VTRVIiLCJleHAiOjE3NTQ0NDMwMjB9.s3iml83m36wdz447MYQ6LrNjXmtuvffZIs9U51huJxABv9rLo59I2ZJNLlKQ6nkA
+        refreshToken:
+          type: string
+          description: Refresh-токен для обновления JWT
+          example: dGhpcy1pcy1hLXJlZnJlc2gtdG9rZW4=
+      description: DTO для возврата JWT-токена и refresh-токена после аутентификации
     UserRegisterDTO:
       required:
         - email
@@ -736,88 +754,97 @@ components:
       type: object
       properties:
         email:
-          maxLength: 255
+          maxLength: 20
           minLength: 3
           type: string
+          description: Email пользователя
+          example: testuser@example.com
         fullname:
           maxLength: 255
           minLength: 0
           type: string
+          description: Полное имя пользователя
+          example: John Doe
         password:
           maxLength: 20
           minLength: 8
           type: string
-    JwtAuthenticationDto:
-      type: object
-      properties:
-        token:
-          type: string
-        refreshToken:
-          type: string
+          description: Пароль пользователя
+          example: password123
+      description: DTO для регистрации и входа пользователя
     UserDTO:
       type: object
       properties:
         email:
           type: string
+          description: Email пользователя
+          example: testuser@example.com
         fullName:
           type: string
+          description: Полное имя пользователя
+          example: John Doe
         role:
           type: string
+          description: Роль пользователя
+          example: USER
           enum:
             - ROLE_USER
             - ROLE_ADMIN
+      description: DTO для представления информации о пользователе
     RefreshTokenDto:
+      required:
+        - refreshToken
       type: object
       properties:
         refreshToken:
           type: string
-    CardResponseBlockDTO:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        blockRequestStatus:
-          type: string
-          enum:
-            - NONE
-            - PENDING
-            - APPROVED
-            - REJECTED
-    CardSetStatusDTO:
-      required:
-        - id
-        - status
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        status:
-          type: string
-          enum:
-            - ACTIVE
-            - BLOCK
-            - EXPIRED
+          description: Refresh-токен для обновления JWT
+          example: dGhpcy1pcy1hLXJlZnJlc2gtdG9rZW4=
+      description: DTO для передачи refresh-токена для обновления JWT
     CardSetStatusResponseDTO:
       type: object
       properties:
         id:
           type: integer
+          description: ID карты
           format: int64
+          example: 101
         status:
           type: string
+          description: Статус карты
+          example: ACTIVE
           enum:
             - ACTIVE
             - BLOCK
             - EXPIRED
         blockRequestStatus:
           type: string
+          description: Статус запроса на блокировку
+          example: PENDING
           enum:
             - NONE
             - PENDING
             - APPROVED
             - REJECTED
+      description: DTO для возврата результата изменения статуса карты
+    CardResponseBlockDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID карты
+          format: int64
+          example: 101
+        blockRequestStatus:
+          type: string
+          description: Статус запроса на блокировку
+          example: PENDING
+          enum:
+            - NONE
+            - PENDING
+            - APPROVED
+            - REJECTED
+      description: DTO для возврата результата запроса на блокировку карты
     Pageable:
       type: object
       properties:
@@ -833,6 +860,73 @@ components:
           type: array
           items:
             type: string
+    PageUserDTO:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDTO'
+        number:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        direction:
+          type: string
+        nullHandling:
+          type: string
+        ascending:
+          type: boolean
+        property:
+          type: string
+        ignoreCase:
+          type: boolean
     PageCardDTO:
       type: object
       properties:
@@ -867,47 +961,19 @@ components:
           $ref: '#/components/schemas/PageableObject'
         empty:
           type: boolean
-    PageableObject:
-      type: object
-      properties:
-        offset:
-          type: integer
-          format: int64
-        sort:
-          type: array
-          items:
-            $ref: '#/components/schemas/SortObject'
-        pageNumber:
-          type: integer
-          format: int32
-        paged:
-          type: boolean
-        pageSize:
-          type: integer
-          format: int32
-        unpaged:
-          type: boolean
-    SortObject:
-      type: object
-      properties:
-        direction:
-          type: string
-        nullHandling:
-          type: string
-        ascending:
-          type: boolean
-        property:
-          type: string
-        ignoreCase:
-          type: boolean
     CardResponseBalanceDTO:
       type: object
       properties:
         id:
           type: integer
+          description: ID карты
           format: int64
+          example: 101
         balance:
           type: number
+          description: Баланс карты
+          example: 1000
+      description: DTO для возврата баланса банковской карты
     CardEntity:
       type: object
       properties:
@@ -927,6 +993,9 @@ components:
             - PENDING
             - APPROVED
             - REJECTED
+        expiryDate:
+          type: string
+          format: date
         status:
           type: string
           enum:
@@ -938,11 +1007,19 @@ components:
       properties:
         id:
           type: integer
+          description: ID карты
           format: int64
+          example: 101
+        maskedNumber:
+          type: string
+          description: Маскированный номер карты
+          example: '**** **** **** 1234'
         user:
           $ref: '#/components/schemas/UserEntity'
         blockRequestStatus:
           type: string
+          description: Статус запроса на блокировку
+          example: PENDING
           enum:
             - NONE
             - PENDING
@@ -950,10 +1027,13 @@ components:
             - REJECTED
         status:
           type: string
+          description: Статус карты
+          example: ACTIVE
           enum:
             - ACTIVE
             - BLOCK
             - EXPIRED
+      description: DTO для возврата статуса запроса на блокировку карты с информацией о пользователе
     PageCardResponseRequestStatusDTO:
       type: object
       properties:
@@ -1009,40 +1089,7 @@ components:
           enum:
             - ROLE_USER
             - ROLE_ADMIN
-    PageUserDTO:
-      type: object
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserDTO'
-        number:
-          type: integer
-          format: int32
-        sort:
-          type: array
-          items:
-            $ref: '#/components/schemas/SortObject'
-        first:
-          type: boolean
-        last:
-          type: boolean
-        numberOfElements:
-          type: integer
-          format: int32
-        pageable:
-          $ref: '#/components/schemas/PageableObject'
-        empty:
-          type: boolean
+      description: Информация о пользователе-владельце карты
   securitySchemes:
     bearerAuth:
       type: http

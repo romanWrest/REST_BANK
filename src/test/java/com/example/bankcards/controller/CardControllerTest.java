@@ -1,37 +1,61 @@
 package com.example.bankcards.controller;
 
-import com.example.bankcards.dto.Card.CardCreateDTO;
-import com.example.bankcards.dto.Card.CardDTO;
-import com.example.bankcards.dto.Card.CardResponseBalanceDTO;
-import com.example.bankcards.dto.Card.CardResponseBlockDTO;
+
+import com.example.bankcards.dto.Card.*;
+import com.example.bankcards.entity.enums.BlockRequestStatus;
+import com.example.bankcards.entity.enums.CardStatus;
+import com.example.bankcards.security.jwt.JwtFilter;
 import com.example.bankcards.service.CardService;
+import com.example.bankcards.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
-class CardControllerTest {
+@WebMvcTest(CardController.class)
+@AutoConfigureMockMvc(addFilters = false)
+public class CardControllerTest {
 
-    @Mock
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
     private CardService cardService;
 
-    @InjectMocks
-    private CardController cardController;
+    @MockBean
+    private JwtFilter jwtFilter;
+
+    @MockBean
+    private UserService userService;
+
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     private CardDTO testCardDTO;
     private CardCreateDTO testCardCreateDTO;
@@ -40,97 +64,150 @@ class CardControllerTest {
 
     @BeforeEach
     void setUp() {
-        testCardDTO = new CardDTO();
-        testCardDTO.setId(1L);
-        testCardDTO.setMaskedNumber("**** **** **** 1234");
-        testCardDTO.setBalance(BigDecimal.valueOf(1000));
-        testCardDTO.setExpiryDate(LocalDate.now().plusYears(1));
+        testCardDTO = new CardDTO()
+                .setId(1L)
+                .setMaskedNumber("**** **** **** 1234")
+                .setBalance(BigDecimal.valueOf(1000))
+                .setExpiryDate(LocalDate.now().plusYears(1));
 
-        testCardCreateDTO = new CardCreateDTO();
-        // установите поля для testCardCreateDTO
+        testCardCreateDTO = new CardCreateDTO()
+                .setNumber("1111 2222 3333 1234")
+                .setStatus(CardStatus.ACTIVE)
+                .setBalance(BigDecimal.valueOf(1000))
+                .setUserId(1L);
 
-        testBalanceDTO = new CardResponseBalanceDTO();
-        testBalanceDTO.setId(1L);
-        testBalanceDTO.setBalance(BigDecimal.valueOf(1000));
+        testBalanceDTO = new CardResponseBalanceDTO()
+                .setBalance(BigDecimal.valueOf(1000))
+                .setId(1L);
 
-        testBlockResponseDTO = new CardResponseBlockDTO();
-        // установите поля для testBlockResponseDTO
+        testBlockResponseDTO = new CardResponseBlockDTO()
+                .setId(1L)
+                .setBlockRequestStatus(BlockRequestStatus.REJECTED);
     }
 
     @Test
-    void createCard_ShouldReturnCreatedStatus() {
-        // Arrange
+    void createCard_ShouldReturnCreatedStatus() throws Exception {
         when(cardService.createCard(any(CardCreateDTO.class))).thenReturn(testCardDTO);
 
-        // Act
-        ResponseEntity<CardDTO> response = cardController.createCard(testCardCreateDTO);
-
-        // Assert
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(testCardDTO, response.getBody());
-        verify(cardService, times(1)).createCard(testCardCreateDTO);
+        mockMvc.perform(post("/api/cards/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testCardCreateDTO)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.maskedNumber").value("**** **** **** 1234"))
+                .andExpect(jsonPath("$.balance").value(1000));
     }
 
     @Test
-    void getCard_ShouldReturnOkStatus() {
-        // Arrange
+    void getCard_ShouldReturnCard() throws Exception {
+        when(cardService.getCard(1L)).thenReturn(testCardDTO);
+
+        mockMvc.perform(get("/api/cards/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
+    }
+
+    @Test
+    void getUserCards_ShouldReturnPaginatedCards() throws Exception {
+        Page<CardDTO> page = new PageImpl<>(List.of(testCardDTO), PageRequest.of(0, 10), 1);
+        when(cardService.getUserCards(eq(1L), any(Pageable.class))).thenReturn(page);
+
+        mockMvc.perform(get("/api/cards/{id}/userCards", 1L)
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1));
+    }
+
+    @Test
+    void getBalance_ShouldReturnBalance() throws Exception {
+        when(cardService.getBalanceCardByCardId(1L)).thenReturn(testBalanceDTO);
+
+        mockMvc.perform(get("/api/cards/{id}/balance", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.balance").value(1000));
+    }
+
+    @Test
+    void requestToBlockCard_ShouldReturnSuccessResponse() throws Exception {
+        when(cardService.requestBlock(1L)).thenReturn(testBlockResponseDTO);
+
+        mockMvc.perform(patch("/api/cards/block/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").exists());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void setStatusCard_ShouldReturnOk() throws Exception {
         Long cardId = 1L;
-        when(cardService.getCard(cardId)).thenReturn(testCardDTO);
+        CardStatus status = CardStatus.BLOCK;
+        CardSetStatusResponseDTO responseDTO = new CardSetStatusResponseDTO()
+                .setId(cardId)
+                .setStatus(status);
 
-        // Act
-        ResponseEntity<CardDTO> response = cardController.getCard(cardId);
+        given(cardService.setStatusCard(eq(cardId), eq(status))).willReturn(responseDTO);
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(testCardDTO, response.getBody());
-        verify(cardService, times(1)).getCard(cardId);
+        mockMvc.perform(patch("/api/cards/status")
+                        .param("id", cardId.toString())
+                        .param("status", status.toString())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(cardId))
+                .andExpect(jsonPath("$.status").value(status.toString()));
     }
 
     @Test
-    void getUserCards_ShouldReturnPageOfCards() {
-        // Arrange
-        Long userId = 1L;
-        Pageable pageable = Pageable.ofSize(10);
-        Page<CardDTO> page = new PageImpl<>(Collections.singletonList(testCardDTO));
-        when(cardService.getUserCards(userId, pageable)).thenReturn(page);
+    @WithMockUser(roles = "ADMIN")
+    void getAllCards_ShouldReturnPageOfCards() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        CardDTO cardDTO = new CardDTO()
+                .setId(1L)
+                .setMaskedNumber("**** **** **** 3456")
+                .setStatus(CardStatus.ACTIVE)
+                .setExpiryDate(LocalDate.now().plusYears(3));
+        Page<CardDTO> page = new PageImpl<>(Collections.singletonList(cardDTO), pageable, 1);
 
-        // Act
-        ResponseEntity<Page<CardDTO>> response = cardController.getUserCards(userId, pageable);
+        given(cardService.getAllCards(any(Pageable.class))).willReturn(page);
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(1, response.getBody().getTotalElements());
-        assertEquals(testCardDTO, response.getBody().getContent().get(0));
-        verify(cardService, times(1)).getUserCards(userId, pageable);
+
+        mockMvc.perform(get("/api/cards/all")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(cardDTO.getId()));
     }
 
     @Test
-    void getBalance_ShouldReturnBalance() {
-        // Arrange
+    @WithMockUser(roles = "ADMIN")
+    void getStatusByRequestStatus_ShouldReturnPageOfStatuses() throws Exception {
+
+        Pageable pageable = PageRequest.of(0, 10);
+        CardResponseRequestStatusDTO statusDTO = new CardResponseRequestStatusDTO()
+                .setId(1L)
+                .setStatus(CardStatus.ACTIVE);
+        Page<CardResponseRequestStatusDTO> page = new PageImpl<>(Collections.singletonList(statusDTO), pageable, 1);
+
+        given(cardService.getStatusesByRequestCards(any(Pageable.class))).willReturn(page);
+
+
+        mockMvc.perform(get("/api/cards/statuses/request/cards")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].id").value(statusDTO.getId()));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void deleteCard_ShouldReturnNoContent() throws Exception {
+
         Long cardId = 1L;
-        when(cardService.getBalanceCardByCardId(cardId)).thenReturn(testBalanceDTO);
+        doNothing().when(cardService).deleteCard(cardId);
 
-        // Act
-        ResponseEntity<CardResponseBalanceDTO> response = cardController.getBalance(cardId);
 
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(testBalanceDTO, response.getBody());
-        verify(cardService, times(1)).getBalanceCardByCardId(cardId);
-    }
-
-    @Test
-    void requestToBlockCard_ShouldReturnBlockResponse() {
-        // Arrange
-        Long cardId = 1L;
-        when(cardService.requestBlock(cardId)).thenReturn(testBlockResponseDTO);
-
-        // Act
-        ResponseEntity<CardResponseBlockDTO> response = cardController.requestToBlockCard(cardId);
-
-        // Assert
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(testBlockResponseDTO, response.getBody());
-        verify(cardService, times(1)).requestBlock(cardId);
+        mockMvc.perform(delete("/api/cards/delete/{id}", cardId))
+                .andExpect(status().isNoContent());
     }
 }

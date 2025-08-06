@@ -2,12 +2,15 @@ package com.example.bankcards.dto.Transfer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldNameConstants;
 
 import java.math.BigDecimal;
 
 @Data
+@Accessors(chain = true)
 @Schema(description = "DTO для выполнения перевода между банковскими картами")
 public class TransferDTO {
 

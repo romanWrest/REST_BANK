@@ -1,9 +1,7 @@
 package com.example.bankcards.controller;
 
-import com.example.bankcards.dto.Card.CardCreateDTO;
-import com.example.bankcards.dto.Card.CardDTO;
-import com.example.bankcards.dto.Card.CardResponseBalanceDTO;
-import com.example.bankcards.dto.Card.CardResponseBlockDTO;
+import com.example.bankcards.dto.Card.*;
+import com.example.bankcards.entity.enums.CardStatus;
 import com.example.bankcards.service.CardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -61,7 +59,7 @@ public class CardController {
     }
 
     @GetMapping("/{id}/userCards")
-    @Operation(summary = "Получить карты пользователя", description = "Возвращает список карт, принадлежащих пользователю, с пагинацией.")
+    @Operation(summary = "Получить карты пользователя", description = "Возвращает список карт, принадлежащих пользователю, с пагинацией. Доступно только администратору.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Список карт успешно получен"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
@@ -69,7 +67,7 @@ public class CardController {
     })
     public ResponseEntity<Page<CardDTO>> getUserCards(
             @Parameter(description = "ID пользователя", required = true) @PathVariable("id") Long id,
-            @Parameter(description = "Параметры пагинации (page, size, sort)", required = true) @Valid @NotNull Pageable pageable) {
+            @Parameter(description = "Возвращает список карт, принадлежащих авторизованному пользователю, с пагинацией.", required = true) @Valid @NotNull Pageable pageable) {
         Page<CardDTO> userCards = cardService.getUserCards(id, pageable);
         return new ResponseEntity<>(userCards, HttpStatus.OK);
     }
@@ -100,4 +98,63 @@ public class CardController {
         CardResponseBlockDTO response = cardService.requestBlock(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PatchMapping("/status")
+    @Operation(summary = "Изменить статус карты", description = "Позволяет администратору изменить статус банковской карты (ACTIVE, BLOCK, EXPIRED).")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Статус карты успешно изменён"),
+            @ApiResponse(responseCode = "400", description = "Неверные данные в запросе"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Карта не найдена")
+    })
+    public ResponseEntity<CardSetStatusResponseDTO> setStatusCard(
+            @RequestParam @NotNull Long id,
+            @RequestParam @NotNull CardStatus status) {
+        CardSetStatusResponseDTO cardSetStatusResponseDTO = cardService.setStatusCard(id, status);
+        return new ResponseEntity<>(cardSetStatusResponseDTO, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/all")
+    @Operation(summary = "Получить все карты всех пользователей", description = "Возвращает список абсолютно всех банковских карт с поддержкой пагинации. Доступно только администратору.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Список карт успешно получен"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён")
+    })
+    public Page<CardDTO> getAllCards(
+            @Parameter(description = "Параметры пагинации (page, size, sort)", required = true) Pageable pageable) {
+        return cardService.getAllCards(pageable);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/statuses/request/cards")
+    @Operation(summary = "Получить статусы запросов на блокировку карт", description = "Возвращает список статусов запросов на блокировку карт с пагинацией. Доступно только администратору.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Список статусов успешно получен"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Ресурс не найден")
+    })
+    public ResponseEntity<Page<CardResponseRequestStatusDTO>> getStatusByRequestStatus(
+            @Parameter(description = "Параметры пагинации (page, size, sort)", required = true) @Valid @NotNull Pageable pageable) {
+        Page<CardResponseRequestStatusDTO> dto = cardService.getStatusesByRequestCards(pageable);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Удалить карту", description = "Удаляет банковскую карту по её ID. Доступно только администратору.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Карта успешно удалена"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
+            @ApiResponse(responseCode = "404", description = "Карта не найдена")
+    })
+    public ResponseEntity<Void> deleteCard(
+            @Parameter(description = "ID карты для удаления", required = true) @PathVariable("id") Long id) {
+        cardService.deleteCard(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
 }

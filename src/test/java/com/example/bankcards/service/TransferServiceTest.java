@@ -50,13 +50,11 @@ class TransferServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Mock JWT authentication
         Authentication authentication = mock(Authentication.class);
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);
         SecurityContextHolder.setContext(securityContext);
 
-        // Initialize test data
         fromCard = new CardEntity();
         fromCard.setId(3L);
         fromCard.setId(3L);
@@ -85,24 +83,22 @@ class TransferServiceTest {
 
     @Test
     void testTransfer_Successful() {
-        // Arrange
+
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
         when(transferRepository.save(any(TransferEntity.class))).thenReturn(transferEntity);
 
-        // Mock CardValidationUtil static methods
         try (MockedStatic<CardValidationUtil> mocked = mockStatic(CardValidationUtil.class)) {
             mocked.when(() -> CardValidationUtil.validateSameUserTransfer(any(), any())).thenAnswer(invocation -> null);
             mocked.when(() -> CardValidationUtil.validateCardsBelongToUser(any(), any(), any())).thenAnswer(invocation -> null);
             mocked.when(() -> CardValidationUtil.validateStatusesCards(any(), any())).thenAnswer(invocation -> null);
             mocked.when(() -> CardValidationUtil.validateBalanceCard(any(), any(), any())).thenAnswer(invocation -> null);
 
-            // Act
+
             TransferResponseDTO result = transferService.transfer(transferDTO);
 
-            // Assert
+
             assertNotNull(result);
-            //assertEquals(1L, 1);
             assertEquals(transferDTO.getFromCardId(), result.getFromCard());
             assertEquals(transferDTO.getToCardId(), result.getToCard());
             assertEquals(transferDTO.getAmount(), result.getAmount());
@@ -115,10 +111,10 @@ class TransferServiceTest {
 
     @Test
     void testTransfer_FromCardNotFound_ThrowsException() {
-        // Arrange
+
         when(cardRepository.findById(1L)).thenReturn(Optional.empty());
 
-        // Act & Assert
+
         CardNotFoundException exception = assertThrows(CardNotFoundException.class, () -> transferService.transfer(transferDTO));
         assertEquals("Карта не найдена с ID: 1", exception.getMessage());
         assertEquals(404, exception.getStatus());
@@ -128,11 +124,11 @@ class TransferServiceTest {
 
     @Test
     void testTransfer_ToCardNotFound_ThrowsException() {
-        // Arrange
+
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.empty());
 
-        // Act & Assert
+
         CardNotFoundException exception = assertThrows(CardNotFoundException.class, () -> transferService.transfer(transferDTO));
         assertEquals("Карта не найдена с ID: 2", exception.getMessage());
         assertEquals(404, exception.getStatus());
@@ -142,12 +138,11 @@ class TransferServiceTest {
 
     @Test
     void testTransfer_InvalidBalance_ThrowsException() {
-        // Arrange
+
         transferDTO.setAmount(new BigDecimal("2000.00")); // More than fromCard balance
         when(cardRepository.findById(1L)).thenReturn(Optional.of(fromCard));
         when(cardRepository.findById(2L)).thenReturn(Optional.of(toCard));
 
-        // Mock CardValidationUtil to throw an exception for balance validation
         try (MockedStatic<CardValidationUtil> mocked = mockStatic(CardValidationUtil.class)) {
             mocked.when(() -> CardValidationUtil.validateSameUserTransfer(any(), any())).thenAnswer(invocation -> null);
             mocked.when(() -> CardValidationUtil.validateCardsBelongToUser(any(), any(), any())).thenAnswer(invocation -> null);
@@ -155,7 +150,7 @@ class TransferServiceTest {
             mocked.when(() -> CardValidationUtil.validateBalanceCard(any(), any(), any()))
                     .thenThrow(new IllegalArgumentException("Недостаточно средств на карте"));
 
-            // Act & Assert
+
             IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> transferService.transfer(transferDTO));
             assertEquals("Недостаточно средств на карте", exception.getMessage());
             verify(cardRepository, never()).save(any(CardEntity.class));

@@ -4,10 +4,12 @@ import com.example.bankcards.entity.enums.CardStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 
 @Data
+@Accessors(chain = true)
 @Schema(description = "DTO для создания новой банковской карты")
 public class CardCreateDTO {
 

@@ -3,8 +3,10 @@ package com.example.bankcards.dto.User;
 import com.example.bankcards.entity.enums.RoleUsers;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(chain = true)
 @Schema(description = "DTO для представления информации о пользователе")
 public class UserDTO {
 

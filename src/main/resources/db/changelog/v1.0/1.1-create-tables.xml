@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet id="1.1_1_create_init_tables" author="Roman Bugaenko">
+        <!-- Users -->
+        <createTable tableName="users">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fullname" type="VARCHAR(255)"/>
+            <column name="password" type="VARCHAR(1000)"/>
+            <column name="role" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Cards -->
+        <createTable tableName="cards">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="number" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_card_user"
+                             referencedTableName="users" referencedColumnNames="id"/>
+            </column>
+            <column name="balance" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="block_request_status" type="VARCHAR(50)"/>
+            <column name="expiry_date" type="DATE"/>
+            <column name="status" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Transfers -->
+        <createTable tableName="transfers">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="transfer_time" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="from_card_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_transfer_from_card"
+                             referencedTableName="cards" referencedColumnNames="id"/>
+            </column>
+            <column name="to_card_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_transfer_to_card"
+                             referencedTableName="cards" referencedColumnNames="id"/>
+            </column>
+            <column name="amount" type="NUMERIC(19,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Индексы -->
+        <createIndex indexName="idx_cards_user_id" tableName="cards">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_transfers_from_card" tableName="transfers">
+            <column name="from_card_id"/>
+        </createIndex>
+
+        <createIndex indexName="idx_transfers_to_card" tableName="transfers">
+            <column name="to_card_id"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

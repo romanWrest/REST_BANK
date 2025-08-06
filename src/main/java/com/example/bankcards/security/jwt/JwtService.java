@@ -9,6 +9,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
@@ -16,7 +17,7 @@ import java.time.ZoneId;
 import java.util.Date;
 
 
-@Component
+@Service
 @Slf4j
 public class JwtService {
     @Value("c362b68d0793bd37b7b5252f250d4abbe02e671cd98d725d73d63bfd2ca3bda3417c7443")

@@ -2,11 +2,13 @@ package com.example.bankcards.dto.Transfer;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
+@Accessors(chain = true)
 public class TransferResponseDTO {
     @Schema(description = "Идентификатор трансфера", example = "1")
     private Long id;
@@ -23,4 +25,3 @@ public class TransferResponseDTO {
     @Schema(description = "Сумма трансфера", example = "100.50")
     private BigDecimal amount;
 }
-// DTO на выход, данные из БД валидны

@@ -3,8 +3,10 @@ package com.example.bankcards.dto.Card;
 import com.example.bankcards.entity.enums.BlockRequestStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(chain = true)
 @Schema(description = "DTO для возврата результата запроса на блокировку карты")
 public class CardResponseBlockDTO {
 

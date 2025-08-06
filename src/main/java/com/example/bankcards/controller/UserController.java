@@ -8,7 +8,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -39,11 +43,11 @@ public class UserController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @Operation(summary = "Получить пользователя по ID", description = "Возвращает информацию о пользователе по его ID.")
+    @Operation(summary = "Получить пользователя по ID", description = "Возвращает информацию о пользователе по его ID. Доступно только администратору.")
     @SecurityRequirement(name = "bearerAuth")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Информация о пользователе успешно получена"),
-            @ApiResponse(responseCode = "401", description = "Администратор не авторизован"),
+            @ApiResponse(responseCode = "401", description = "Пользователь не авторизован"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "404", description = "Пользователь не найден")
     })
@@ -51,5 +55,20 @@ public class UserController {
             @Parameter(description = "ID пользователя", required = true) @PathVariable("id") Long id) {
         UserDTO userDTO = userService.getUser(id);
         return new ResponseEntity<>(userDTO, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/all")
+    @Operation(summary = "Получить всех пользователей", description = "Возвращает список всех пользователей с пагинацией. Доступно только администратору.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Список пользователей успешно получен"),
+            @ApiResponse(responseCode = "401", description = "Пользователь не авторизован"),
+            @ApiResponse(responseCode = "403", description = "Доступ запрещён")
+    })
+    public ResponseEntity<Page<UserDTO>> getAllUsers(
+            @Parameter(description = "Параметры пагинации (page, size, sort)", required = true) @Valid @NotNull Pageable pageable) {
+        Page<UserDTO> users = userService.getAllUsers(pageable);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 }

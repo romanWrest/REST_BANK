@@ -1,4 +1,4 @@
-package com.example.bankcards.security;
+package com.example.bankcards.config;
 
 import com.example.bankcards.security.jwt.JwtFilter;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
+
     private final UserDetailsService userDetailsService;
     private final JwtFilter jwtFilter;
 
@@ -42,24 +43,16 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
-                                "/api/auth/registration",
-                                "/api/auth/sign-in",
-                                "/",
-                                "/error",
+                                "/api/auth/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/api-docs.yaml",
                                 "/v3/api-docs.yaml").permitAll()
                         .requestMatchers(
-                                "/api/users/**",
-                                "api/self",
-                                "/api/cards/{id}/balance",
-                                "/api/cards/create",
-                                "/api/cards/{id}",
-                                "/api/cards/{id}/userCards",
-                                "/user/cards/by/status",
-                                "/api/transfer"
+                                "/api/cards/**",
+                                "api/transfer",
+                                "api/users/**"
                         ).authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

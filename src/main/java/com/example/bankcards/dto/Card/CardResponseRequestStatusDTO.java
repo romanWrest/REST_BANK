@@ -5,8 +5,10 @@ import com.example.bankcards.entity.enums.BlockRequestStatus;
 import com.example.bankcards.entity.enums.CardStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 @Data
+@Accessors(chain = true)
 @Schema(description = "DTO для возврата статуса запроса на блокировку карты с информацией о пользователе")
 public class CardResponseRequestStatusDTO {
 

@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
 @Entity
 @ToString(exclude = {"password"})
 @Table(name = "users")
+@Accessors(chain = true)
 @Valid
 @Hidden
 public class UserEntity {
