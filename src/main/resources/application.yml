@@ -18,21 +18,27 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
+liquibase:
+  change-log: classpath:db/changelog/db.changelog-master.yaml
+  enabled: true
 
 logging:
   level:
+    liquibase: DEBUG
     org:
       springframework:
         web: DEBUG
         security: DEBUG
+        http: DEBUG
     com:
       example:
         bankcards: DEBUG
+
 
 encryption:
   key: c362b68d0793bd37b7b5252f250d4abbe02e671cd98d725d73d63bfd2ca3bda3417c7443
@@ -50,8 +56,4 @@ springdoc:
   default-produces-media-type: application/json
   cache:
     disabled: true
-  #Что нужно сделать:
-  # - Указать настройки подключения к базе данных.
-  #- Указать порт приложения.
-  #- Настроить параметры безопасности и JWT.
-  #- Включить Swagger UI.
+

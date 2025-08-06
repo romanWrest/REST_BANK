@@ -56,12 +56,12 @@ public class AdminController {
             @ApiResponse(responseCode = "200", description = "Список карт успешно получен"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён")
     })
-    public List<CardDTO> getAllCards(
+    public Page<CardDTO> getAllCards(
             @Parameter(description = "Параметры пагинации (page, size, sort)", required = true) Pageable pageable) {
         return cardService.getAllCards(pageable);
     }
 
-    @GetMapping("{id}/cards")
+    @GetMapping("/statuses/request/cards")
     @Operation(summary = "Получить статусы запросов на блокировку карт по запросам", description = "Возвращает список статусов запросов на блокировку карт по запросам с пагинацией.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Список статусов успешно получен"),
@@ -100,7 +100,7 @@ public class AdminController {
     }
 
     @GetMapping("/users/{id}/cards")
-    @Operation(summary = "Получить карты пользователя", description = "Возвращает список карт, принадлежащих пользователю по его ID.")
+    @Operation(summary = "Получить карты пользователя", description = "Возвращает список карт, принадлежащих пользователю по его ID. Доступно только для администратора")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Список карт пользователя успешно получен"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),

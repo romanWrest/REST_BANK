@@ -14,6 +14,5 @@ public interface UserMapper {
     UserDTO toUserDTO(UserEntity userEntity);
 
     @Mapping(target = "password", expression = "java(passwordEncoder.encode(dto.getPassword()))")
-    //@Mapping(target = "role", constant = "ROLE_ADMIN") запустить для установки админа
     UserEntity toEntity(UserRegisterDTO dto, @Context PasswordEncoder passwordEncoder);
 }

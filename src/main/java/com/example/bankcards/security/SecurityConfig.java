@@ -42,9 +42,10 @@ public class SecurityConfig {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth.requestMatchers(
-                                "/auth/registration",
-                                "/auth/**",
+                                "/api/auth/registration",
+                                "/api/auth/sign-in",
                                 "/",
+                                "/error",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -52,11 +53,13 @@ public class SecurityConfig {
                                 "/v3/api-docs.yaml").permitAll()
                         .requestMatchers(
                                 "/api/users/**",
-                                "self",
+                                "api/self",
+                                "/api/cards/{id}/balance",
                                 "/api/cards/create",
                                 "/api/cards/{id}",
                                 "/api/cards/{id}/userCards",
-                                "/user/cards/by/status\""
+                                "/user/cards/by/status",
+                                "/api/transfer"
                         ).authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

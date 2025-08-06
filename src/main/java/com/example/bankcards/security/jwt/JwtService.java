@@ -6,6 +6,7 @@ import com.example.bankcards.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,14 +15,12 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 
 @Component
+@Slf4j
 public class JwtService {
-    private static final Logger log = LogManager.getLogger(JwtService.class);
     @Value("c362b68d0793bd37b7b5252f250d4abbe02e671cd98d725d73d63bfd2ca3bda3417c7443")
-    private String jwtSecret;
+    public String jwtSecret;
 
     private final UserRepository userRepository;
 
@@ -50,7 +49,7 @@ public class JwtService {
     public boolean validateJwtToken(String token) {
         try {
             Jwts.parser()
-                    .verifyWith(getSingKey())
+                    .verifyWith(getSignKey())
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
@@ -71,7 +70,7 @@ public class JwtService {
 
     public String getEmailFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSingKey())
+                .verifyWith(getSignKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
@@ -80,20 +79,20 @@ public class JwtService {
 
     public String getRoleFromToken(String token) {
         Claims claims = Jwts.parser()
-                .verifyWith(getSingKey())
+                .verifyWith(getSignKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
         return (String) claims.get("role");
     }
 
-    private String generateJwtToken(String email, String role) {
+    public String generateJwtToken(String email, String role) {
         Date date = Date.from(LocalDateTime.now().plusHours(24).atZone(ZoneId.systemDefault()).toInstant());
         return Jwts.builder()
                 .subject(email)
                 .claim("role", role)
                 .expiration(date)
-                .signWith(getSingKey())
+                .signWith(getSignKey())
                 .compact();
     }
 
@@ -103,12 +102,17 @@ public class JwtService {
                 .subject(email)
                 .claim("role", role)
                 .expiration(date)
-                .signWith(getSingKey())
+                .signWith(getSignKey())
                 .compact();
     }
 
-    private SecretKey getSingKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
-        return Keys.hmacShaKeyFor(keyBytes);
+    private SecretKey getSignKey() {
+        try {
+            byte[] keyBytes = Decoders.BASE64.decode(jwtSecret);
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid BASE64 secret key: {}", e.getMessage(), e);
+            throw new IllegalStateException("Failed to decode JWT secret key", e);
+        }
     }
 }

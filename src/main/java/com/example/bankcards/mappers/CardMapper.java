@@ -16,7 +16,7 @@ public interface CardMapper {
 
     @Mappings({
             @Mapping(source = "number", target = "maskedNumber", qualifiedByName = "maskedNumberMapper"),
-            @Mapping(source = CardEntity.Fields.status, target = CardDTO.Fields.status),
+            @Mapping(source = "status", target = "status"),
     })
     CardDTO toCardDTO(CardEntity cardEntity);
 
@@ -32,8 +32,7 @@ public interface CardMapper {
     CardEntity toEntity(CardCreateDTO dto);
 
     @Mappings({
-            //   @Mapping(source = "number", target = "number", ignore = true), // указанных target нет в итоговом DTO
-            //   @Mapping(source = "balance", target = "balance", ignore = true)// но так требует mapstruct
+            @Mapping(source = "number", target = "maskedNumber", qualifiedByName = "maskedNumberMapper"),
     })
     CardResponseRequestStatusDTO toCardResponseRequestStatusDTO(CardEntity cardEntity);
 }

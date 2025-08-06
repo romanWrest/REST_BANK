@@ -1,7 +1,7 @@
 package com.example.bankcards.controller;
 
 import com.example.bankcards.dto.Transfer.TransferDTO;
-import com.example.bankcards.dto.Transfer.TransferEntityDTO;
+import com.example.bankcards.dto.Transfer.TransferResponseDTO;
 import com.example.bankcards.service.TransferService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -32,18 +32,10 @@ public class TransferController {
             @ApiResponse(responseCode = "400", description = "Неверные данные в запросе"),
             @ApiResponse(responseCode = "403", description = "Доступ запрещён"),
             @ApiResponse(responseCode = "404", description = "Карта не найдена"),
-            @ApiResponse(responseCode = "422", description = "Недостаточно средств или карта заблокирована(BLOCK, EXPIRED)")
+            @ApiResponse(responseCode = "400", description = "Недостаточно средств или карта заблокирована(BLOCK, EXPIRED)")
     })
-    public ResponseEntity<TransferEntityDTO> transfer(@Valid @RequestBody TransferDTO transferDTO) {
-        try {
-            TransferEntityDTO transferEntityDTO = transferService.transfer(transferDTO);
-            return new ResponseEntity<>(transferEntityDTO, HttpStatus.OK);
-        } catch (IllegalStateException e) {
-            return new ResponseEntity<>(null, HttpStatus.UNPROCESSABLE_ENTITY); // 422
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST); // 400
-        }
+    public ResponseEntity<TransferResponseDTO> transfer(@Valid @RequestBody TransferDTO transferDTO) {
+        TransferResponseDTO dto = transferService.transfer(transferDTO);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
     }
-
-
 }

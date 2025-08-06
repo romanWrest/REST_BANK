@@ -1,26 +1,23 @@
 package com.example.bankcards.mappers;
 
-import com.example.bankcards.dto.Transfer.TransferDTO;
-import com.example.bankcards.dto.Transfer.TransferEntityDTO;
-import com.example.bankcards.dto.Transfer.TransferResponseDTO;
-import com.example.bankcards.entity.TransferEntity;
+import com.example.bankcards.dto.Card.CardDTO;
+import com.example.bankcards.entity.CardEntity;
+import com.example.bankcards.util.MaskingUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-
+import org.mapstruct.Named;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface TransferMapper {
+    TransferMapper INSTANCE = Mappers.getMapper(TransferMapper.class);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = TransferEntity.Fields.fromCard, source = TransferDTO.Fields.fromCardId)
-    @Mapping(target = TransferEntity.Fields.toCard, source = "toCardId")
-    @Mapping(target = TransferEntity.Fields.transferTime, ignore = true)
-    TransferEntity toEntity(TransferDTO dto);
 
-    @Mapping(target = TransferEntityDTO.Fields.fromCardId, source = TransferEntity.Fields.fromCard)
-    @Mapping(target = TransferEntityDTO.Fields.toCardId, source = TransferEntity.Fields.toCard)
-    TransferEntityDTO toEntityDto(TransferEntity entity);
+    @Mapping(target = "maskedNumber", source = "number", qualifiedByName = "maskedNumberMapper")
+    CardDTO toCardDTO(CardEntity cardEntity);
 
-    @Mapping(target = TransferEntity.Fields.transferTime, source = TransferEntity.Fields.transferTime)
-    TransferResponseDTO toResponseDto(TransferEntity entity);
+    @Named("maskedNumberMapper")
+    static String maskedNumberMapper(String number) {
+        return MaskingUtil.maskCardNumber(number);
+    }
 }

@@ -87,7 +87,7 @@ public class CardController {
         return new ResponseEntity<>(cardResponseBalanceDTO, HttpStatus.OK);
     }
 
-    @PatchMapping("/block")
+    @PatchMapping("/block/{id}")
     @Operation(summary = "Запрос на блокировку карты", description = "Отправляет запрос на блокировку карты по её ID. Доступно для авторизованных пользователей.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Запрос на блокировку успешно отправлен"),
