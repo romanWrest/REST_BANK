@@ -5,5 +5,7 @@ public class MaskingUtil {
         if (cardNumber == null || cardNumber.length() < 4) return cardNumber;
         return "**** **** **** " + cardNumber.substring(cardNumber.length() - 4);
         // Добавим одну строку
+
+
     }
 }
